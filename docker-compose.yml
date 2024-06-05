@@ -1,0 +1,13 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:16.2-alpine
+    restart: always
+    shm_size: 128mb
+    hostname: db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: blog-pg
+    ports:
+      - '5432:5432'

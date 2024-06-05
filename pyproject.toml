@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "my-blog"
+version = "0.1.0"
+description = ""
+authors = ["Dr1DeX"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = {extras = ["all"], version = "^0.111.0"}
+pydantic = "^2.7.3"
+pydantic-settings = "^2.3.0"
+alembic = "^1.13.1"
+sqlalchemy = "^2.0.30"
+greenlet = "^3.0.3"
+psycopg2 = "^2.9.9"
+asyncpg = "^0.29.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
