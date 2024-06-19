@@ -1,8 +1,8 @@
-"""init-autogen
+"""post-change
 
-Revision ID: 0a58ed22af45
+Revision ID: 00e6b3675ae1
 Revises: 
-Create Date: 2024-06-06 14:58:03.259578
+Create Date: 2024-06-19 18:58:30.840607
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '0a58ed22af45'
+revision: str = '00e6b3675ae1'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None

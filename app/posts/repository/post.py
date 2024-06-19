@@ -40,10 +40,8 @@ class PostRepository:
             categories: list[Categories] = (await session.execute(select(Categories))).scalars().all()
             return categories
 
-    async def get_post_by_categories_name(self, category_name: str) -> list[Posts]:
-        query = (select(Posts)
-                 .join(Categories, Posts.category_id == Categories.id)
-                 .where(Categories.name == category_name))
+    async def get_post_by_categories_name(self, cat_name: str) -> list[Posts]:
+        query = select(Posts).join(Categories, Posts.category_id == Categories.id).where(Categories.name == cat_name)
 
         async with self.db_session as session:
             post: list[Posts] = (await session.execute(query)).scalars().all()
