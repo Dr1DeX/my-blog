@@ -1,7 +1,7 @@
 import asyncio
 
 from app.infrastructure.database import Base
-from models_loader import import_all_models
+from utils.autoimport import import_all_models
 
 from logging.config import fileConfig
 

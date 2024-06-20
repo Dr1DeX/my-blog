@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from sqlalchemy import select, delete, update, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.exception import CategoryNotFoundException
 from app.posts.models import Posts, Categories
+from app.posts.posts_exception import CategoryNotFoundException
 from app.posts.schema import PostCreateSchema
 from app.users.user_profile.models import UserProfile
 

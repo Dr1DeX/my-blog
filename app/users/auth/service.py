@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime as dt, timedelta
 from jose import jwt, JWTError
 
-from app.exception import (
+from app.users.user_exception import (
     UserNotFoundException,
     UserWrongPasswordException,
     TokenNotCorrectException,
