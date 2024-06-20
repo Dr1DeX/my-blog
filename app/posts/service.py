@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from app.exception import PostNotFoundException, PostByCategoryNameException
+from app.posts.posts_exception import PostByCategoryNameException, PostNotFoundException
 from app.posts.repository import PostRepository
 from app.posts.schema import PostSchema, PostCreateSchema, CategoriesSchema
 

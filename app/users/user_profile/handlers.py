@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from app.dependency import get_user_service
+from app.users.users_dependency import get_user_service
 from app.users.user_profile.schema import UserCreateSchema
 from app.users.auth.schema import UserLoginSchema
 from app.users.user_profile.service import UserService

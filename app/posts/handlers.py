@@ -2,11 +2,11 @@ from typing import Annotated
 
 from fastapi import APIRouter, status, Depends, HTTPException
 
-from app.dependency import get_post_service, get_request_user_id
-from app.exception import PostNotFoundException, CategoryNotFoundException
+from app.default_dependency import get_request_user_id
+from app.posts.posts_dependency import get_post_service
+from app.posts.posts_exception import CategoryNotFoundException, PostNotFoundException, PostByCategoryNameException
 from app.posts.schema import PostSchema, PostCreateSchema, CategoriesSchema
 from app.posts.service import PostService
-from app.exception import PostByCategoryNameException
 
 router = APIRouter(prefix='/post', tags=['post'])
 

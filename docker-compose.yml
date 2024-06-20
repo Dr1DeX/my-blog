@@ -4,10 +4,28 @@ services:
     image: postgres:16.2-alpine
     restart: always
     shm_size: 128mb
-    hostname: db
+    hostname: blog-pg
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: blog-pg
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - blog-data:/var/lib/postgresql/data
     ports:
       - '5432:5432'
+
+  backend:
+    build:
+      dockerfile: backend.Dockerfile
+    hostname: blog-backend
+    depends_on:
+      - db
+    ports:
+      - '8001:8001'
+    restart: always
+    env_file:
+      - .env.dev
+
+volumes:
+  blog-data:
