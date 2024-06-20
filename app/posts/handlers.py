@@ -2,8 +2,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, status, Depends, HTTPException
 
-from app.dependency import get_post_service
-from app.exception import PostNotFoundException
+from app.dependency import get_post_service, get_request_user_id
+from app.exception import PostNotFoundException, CategoryNotFoundException
 from app.posts.schema import PostSchema, PostCreateSchema, CategoriesSchema
 from app.posts.service import PostService
 from app.exception import PostByCategoryNameException
@@ -63,3 +63,21 @@ async def get_all_categories(
         post_service: Annotated[PostService, Depends(get_post_service)]
 ):
     return await post_service.get_categories()
+
+
+@router.post(
+    '/create',
+    response_model=PostSchema
+)
+async def create_post(
+        body: PostCreateSchema,
+        post_service: Annotated[PostService, Depends(get_post_service)],
+        author_id: int = Depends(get_request_user_id)
+):
+    try:
+        return await post_service.create_post(body=body, author_id=author_id)
+    except CategoryNotFoundException as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=e.detail
+        )

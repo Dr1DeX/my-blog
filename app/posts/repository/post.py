@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from sqlalchemy import select, delete, update, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.exception import CategoryNotFoundException
 from app.posts.models import Posts, Categories
 from app.posts.schema import PostCreateSchema
 from app.users.user_profile.models import UserProfile
@@ -22,14 +23,17 @@ class PostRepository:
             return post
 
     async def create_post(self, body: PostCreateSchema, author_id: int) -> int:
-        query = insert(Posts).values(
-            title=body.title,
-            description=body.description,
-            category_id=body.category_id,
-            author_id=author_id
-        ).returning(Posts.id)
-
         async with self.db_session as session:
+            cat_id = select(Categories.id).where(Categories.id == body.category_id)
+            cat_query = (await session.execute(cat_id)).scalar_one_or_none()
+            if not cat_query:
+                raise CategoryNotFoundException
+            query = insert(Posts).values(
+                title=body.title,
+                description=body.description,
+                category_id=body.category_id,
+                author_id=author_id
+            ).returning(Posts.id)
             post_id = (await session.execute(query)).scalar_one()
             await session.commit()
             await session.flush()
