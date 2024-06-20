@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     DB_PORT: int = 5432
     DB_NAME: str = 'blog-pg'
     DB_DRIVER: str = 'postgresql+asyncpg'
+    JWT_SECRET_KEY: str = 'mega-super-secret'
+    JWT_ENCODE_ALGORYTHM: str = 'HS256'
 
     @property
     def db_url(self):
