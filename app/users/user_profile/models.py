@@ -2,7 +2,7 @@ from typing import Optional
 
 from app.infrastructure.database import Base
 
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 class UserProfile(Base):
@@ -15,3 +15,5 @@ class UserProfile(Base):
     email: Mapped[Optional[str]]
     google_access_token: Mapped[Optional[str]]
     yandex_access_token: Mapped[Optional[str]]
+
+    posts = relationship('Posts', back_populates='author')

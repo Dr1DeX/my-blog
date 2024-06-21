@@ -11,14 +11,29 @@ class PostService:
 
     async def get_posts(self) -> list[PostSchema]:
         posts = await self.post_repository.get_posts()
-        posts_schema = [PostSchema.model_validate(post) for post in posts]
+        posts_schema = [
+            PostSchema(
+                id=post.id,
+                title=post.title,
+                description=post.description,
+                author_name=post.author.username,
+                category_name=post.category.name
+            )
+            for post in posts
+        ]
         return posts_schema
 
     async def get_post(self, post_id: int) -> PostSchema:
         post = await self.post_repository.get_post(post_id=post_id)
         if not post:
             raise PostNotFoundException
-        return PostSchema.model_validate(post)
+        return PostSchema(
+            id=post.id,
+            title=post.title,
+            description=post.description,
+            author_name=post.author.username,
+            category_name=post.category.name
+        )
 
     async def get_categories(self) -> list[CategoriesSchema]:
         categories = await self.post_repository.get_categories()
