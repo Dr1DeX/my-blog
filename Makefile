@@ -13,6 +13,9 @@ migrate-create:
 migrate-apply:
 	alembic upgrade head
 
+migrate-rollback:
+	alembic downgrader ${REVISION}
+
 git-push:
 	git push --set-upstream origin ${BRANCH}
 

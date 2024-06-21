@@ -8,3 +8,7 @@ class PostByCategoryNameException(Exception):
 
 class CategoryNotFoundException(Exception):
     detail = 'Category not found'
+
+
+class FileFormatIncorrectException(Exception):
+    detail = 'File format not supported'

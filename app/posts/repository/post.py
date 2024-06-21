@@ -1,11 +1,21 @@
+import os
+import aiofiles
+
+from uuid import uuid4
+
+from fastapi import UploadFile, File
+
 from dataclasses import dataclass
 from sqlalchemy import select, delete, update, insert
 from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.posts.models import Posts, Categories
-from app.posts.posts_exception import CategoryNotFoundException, PostNotFoundException
+from app.posts.posts_exception import CategoryNotFoundException, PostNotFoundException, FileFormatIncorrectException
 from app.posts.schema import PostCreateSchema
+from app.settings import Settings
+
+settings = Settings()
 
 
 @dataclass
@@ -29,7 +39,7 @@ class PostRepository:
             post: Posts = (await session.execute(query)).scalar_one_or_none()
             return post
 
-    async def create_post(self, body: PostCreateSchema, author_id: int) -> int:
+    async def create_post(self, body: PostCreateSchema, author_id: int, image_url: str | None) -> int:
         async with self.db_session as session:
             cat_id = select(Categories.id).where(Categories.id == body.category_id)
             cat_query = (await session.execute(cat_id)).scalar_one_or_none()
@@ -39,9 +49,10 @@ class PostRepository:
                 title=body.title,
                 description=body.description,
                 category_id=body.category_id,
-                author_id=author_id
+                author_id=author_id,
+                image_url=image_url
             ).returning(Posts.id)
-            post_id = (await session.execute(query)).scalar_one()
+            post_id = (await session.execute(query)).scalar()
             await session.commit()
             await session.flush()
             return post_id
@@ -58,13 +69,16 @@ class PostRepository:
             post: list[Posts] = (await session.execute(query)).scalars().all()
             return post
 
-    async def update_post(self, post_id: int, author_id: int, body: PostCreateSchema) -> int:
+    async def update_post(self, post_id: int, author_id: int, body: PostCreateSchema, image_url: str | None) -> int:
         post_query = await self.get_post(post_id=post_id)
         if not post_query:
             raise PostNotFoundException
+        values = body.dict(exclude_unset=True)
+        if image_url:
+            values['image_url'] = image_url
         query = (update(Posts)
                  .where(Posts.id == post_id, Posts.author_id == author_id)
-                 .values(**body.dict(exclude_unset=True))
+                 .values(**values)
                  ).returning(Posts.id)
         async with self.db_session as session:
             post_id: int = (await session.execute(query)).scalar_one_or_none()
@@ -81,3 +95,28 @@ class PostRepository:
             await session.execute(query)
             await session.commit()
             await session.flush()
+
+    async def upload_image(self, author_id: int, post_id: int, file: UploadFile = File(...)) -> str:
+        file_extension = file.filename.split('.')[-1]
+        if file_extension not in ('jpg', 'jpeg', 'png'):
+            raise FileFormatIncorrectException
+
+        file_name = f'{uuid4()}.{file_extension}'
+        file_path = os.path.join(settings.UPLOAD_DIRECTORY, file_name)
+
+        async with aiofiles.open(file_path, 'wb') as out_file:
+            content = await file.read()
+            await out_file.write(content)
+
+        image_url = f'/static/{file_name}'
+
+        query = (update(Posts)
+                 .where(Posts.id == post_id, Posts.author_id == author_id)
+                 .values(image_url=image_url)
+                 )
+        async with self.db_session as session:
+            await session.execute(query)
+            await session.commit()
+            await session.flush()
+
+        return image_url

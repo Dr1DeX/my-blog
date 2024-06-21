@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 def import_all_models():
-    base_dir = Path(__file__).resolve().parent / 'app'
+    base_dir = Path(__file__).resolve().parent.parent.parent / 'app'
     unique_class = {}
 
     for root, dirs, files in os.walk(base_dir):
