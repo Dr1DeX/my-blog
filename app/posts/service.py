@@ -36,3 +36,15 @@ class PostService:
         post_id = await self.post_repository.create_post(body=body, author_id=author_id)
         post = await self.post_repository.get_post(post_id=post_id)
         return PostSchema.model_validate(post)
+
+    async def update_post(self, post_id: int, author_id: int, body: PostCreateSchema) -> PostSchema:
+        post_id = await self.post_repository.update_post(
+            author_id=author_id,
+            post_id=post_id,
+            body=body
+        )
+        updated_post = await self.post_repository.get_post(post_id=post_id)
+        return PostSchema.model_validate(updated_post)
+
+    async def delete_post(self, post_id: int, author_id: int) -> None:
+        await self.post_repository.delete_post(post_id=post_id, author_id=author_id)

@@ -3,9 +3,8 @@ from sqlalchemy import select, delete, update, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.posts.models import Posts, Categories
-from app.posts.posts_exception import CategoryNotFoundException
+from app.posts.posts_exception import CategoryNotFoundException, PostNotFoundException
 from app.posts.schema import PostCreateSchema
-from app.users.user_profile.models import UserProfile
 
 
 @dataclass
@@ -50,3 +49,27 @@ class PostRepository:
         async with self.db_session as session:
             post: list[Posts] = (await session.execute(query)).scalars().all()
             return post
+
+    async def update_post(self, post_id: int, author_id: int, body: PostCreateSchema) -> int:
+        post_query = await self.get_post(post_id=post_id)
+        if not post_query:
+            raise PostNotFoundException
+        query = (update(Posts)
+                 .where(Posts.id == post_id, Posts.author_id == author_id)
+                 .values(**body.dict(exclude_unset=True))
+                 ).returning(Posts.id)
+        async with self.db_session as session:
+            post_id: int = (await session.execute(query)).scalar_one_or_none()
+            await session.commit()
+            await session.flush()
+            return post_id
+
+    async def delete_post(self, post_id: int, author_id: int) -> None:
+        post_query = await self.get_post(post_id=post_id)
+        if not post_query:
+            raise PostNotFoundException
+        query = delete(Posts).where(Posts.id == post_id, Posts.author_id == author_id)
+        async with self.db_session as session:
+            await session.execute(query)
+            await session.commit()
+            await session.flush()
