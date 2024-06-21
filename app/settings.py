@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     DB_DRIVER: str = 'postgresql+asyncpg'
     JWT_SECRET_KEY: str = 'mega-super-secret'
     JWT_ENCODE_ALGORYTHM: str = 'HS256'
+    UPLOAD_DIRECTORY: str = '/uploads'
 
     @property
     def db_url(self):

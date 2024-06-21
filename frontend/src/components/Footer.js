@@ -6,9 +6,6 @@ const FooterContainer = styled.footer`
     padding: 20px;
     background-color: #333;
     color: white;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
 `;
 
 const Footer = () => {

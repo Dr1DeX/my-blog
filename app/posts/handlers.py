@@ -19,7 +19,9 @@ router = APIRouter(prefix='/api/post', tags=['post'])
 async def get_posts(
         post_service: Annotated[PostService, Depends(get_post_service)]
 ):
-    return await post_service.get_posts()
+    posts = await post_service.get_posts()
+    posts[-1].human_readable_dates()
+    return posts
 
 
 @router.get(
@@ -31,7 +33,9 @@ async def get_post(
         post_service: Annotated[PostService, Depends(get_post_service)]
 ):
     try:
-        return await post_service.get_post(post_id=post_id)
+        post = await post_service.get_post(post_id=post_id)
+        post.human_readable_dates()
+        return post
     except PostNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_204_NO_CONTENT,
@@ -76,7 +80,9 @@ async def create_post(
         author_id: int = Depends(get_request_user_id)
 ):
     try:
-        return await post_service.create_post(body=body, author_id=author_id)
+        post = await post_service.create_post(body=body, author_id=author_id)
+        post.human_readable_dates()
+        return post
     except CategoryNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

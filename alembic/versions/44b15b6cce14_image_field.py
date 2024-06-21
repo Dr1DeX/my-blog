@@ -1,8 +1,8 @@
-"""post-change
+"""image-field
 
-Revision ID: 00e6b3675ae1
+Revision ID: 44b15b6cce14
 Revises: 
-Create Date: 2024-06-19 18:58:30.840607
+Create Date: 2024-06-21 14:55:53.699452
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '00e6b3675ae1'
+revision: str = '44b15b6cce14'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -31,6 +31,8 @@ def upgrade() -> None:
     sa.Column('password', sa.String(), nullable=True),
     sa.Column('name', sa.String(), nullable=True),
     sa.Column('email', sa.String(), nullable=True),
+    sa.Column('google_access_token', sa.String(), nullable=True),
+    sa.Column('yandex_access_token', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('Posts',
@@ -39,6 +41,7 @@ def upgrade() -> None:
     sa.Column('description', sa.String(), nullable=False),
     sa.Column('author_id', sa.Integer(), nullable=False),
     sa.Column('category_id', sa.Integer(), nullable=False),
+    sa.Column('image_url', sa.String(), nullable=True),
     sa.ForeignKeyConstraint(['author_id'], ['UserProfile.id'], ),
     sa.ForeignKeyConstraint(['category_id'], ['Categories.id'], ),
     sa.PrimaryKeyConstraint('id')
