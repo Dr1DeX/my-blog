@@ -8,7 +8,7 @@ from app.users.user_exception import UserNotFoundException, UserWrongPasswordExc
 from app.users.user_profile.schema import UserCreateSchema
 from app.users.auth.service import AuthService
 
-router = APIRouter(prefix='/auth', tags=['auth'])
+router = APIRouter(prefix='/api/auth', tags=['auth'])
 
 
 @router.post(
