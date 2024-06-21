@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from sqlalchemy import select, delete, update, insert
+from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.posts.models import Posts, Categories
@@ -12,13 +13,20 @@ class PostRepository:
     db_session: AsyncSession
 
     async def get_posts(self) -> list[Posts]:
+        query = (select(Posts)
+                 .options(joinedload(Posts.author), joinedload(Posts.category))
+                 )
         async with self.db_session as session:
-            posts: list[Posts] = (await session.execute(select(Posts))).scalars().all()
+            posts: list[Posts] = (await session.execute(query)).scalars().all()
             return posts
 
     async def get_post(self, post_id: int) -> Posts | None:
+        query = (select(Posts)
+                 .options(joinedload(Posts.author), joinedload(Posts.category))
+                 .where(Posts.id == post_id)
+                 )
         async with self.db_session as session:
-            post: Posts = (await session.execute(select(Posts).where(Posts.id == post_id))).scalar_one_or_none()
+            post: Posts = (await session.execute(query)).scalar_one_or_none()
             return post
 
     async def create_post(self, body: PostCreateSchema, author_id: int) -> int:
