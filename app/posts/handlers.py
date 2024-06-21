@@ -9,7 +9,7 @@ from app.posts.schema import PostSchema, PostCreateSchema, CategoriesSchema
 from app.posts.service import PostService
 from app.posts.success_exception import PostDeleteSuccessException
 
-router = APIRouter(prefix='/post', tags=['post'])
+router = APIRouter(prefix='/api/post', tags=['post'])
 
 
 @router.get(
