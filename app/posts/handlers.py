@@ -7,6 +7,7 @@ from app.posts.posts_dependency import get_post_service
 from app.posts.posts_exception import CategoryNotFoundException, PostNotFoundException, PostByCategoryNameException
 from app.posts.schema import PostSchema, PostCreateSchema, CategoriesSchema
 from app.posts.service import PostService
+from app.posts.success_exception import PostDeleteSuccessException
 
 router = APIRouter(prefix='/post', tags=['post'])
 
@@ -81,3 +82,47 @@ async def create_post(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=e.detail
         )
+
+
+@router.patch(
+    '/update_post',
+    response_model=PostSchema
+)
+async def update_post(
+        body: PostCreateSchema,
+        post_id: int,
+        post_service: Annotated[PostService, Depends(get_post_service)],
+        author_id: int = Depends(get_request_user_id)
+):
+    try:
+        return await post_service.update_post(
+            post_id=post_id,
+            author_id=author_id,
+            body=body
+        )
+    except PostNotFoundException as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=e.detail
+        )
+
+
+@router.delete(
+    '/delete_post',
+)
+async def delete_post(
+        post_id: int,
+        post_service: Annotated[PostService, Depends(get_post_service)],
+        author_id: int = Depends(get_request_user_id)
+):
+    try:
+        await post_service.delete_post(post_id=post_id, author_id=author_id)
+    except PostNotFoundException as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=e.detail
+        )
+    return HTTPException(
+        status_code=status.HTTP_204_NO_CONTENT,
+        detail=PostDeleteSuccessException.detail
+    )

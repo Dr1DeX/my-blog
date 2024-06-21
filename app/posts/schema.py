@@ -15,7 +15,7 @@ class PostSchema(BaseModel):
 class PostCreateSchema(BaseModel):
     title: str | None = None
     description: str | None = None
-    category_id: int
+    category_id: int | None = None
 
 
 class CategoriesSchema(BaseModel):
