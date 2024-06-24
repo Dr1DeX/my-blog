@@ -7,6 +7,11 @@ import PostPage from "./pages/PostPage";
 import PostDetailPage from "./pages/PostDetailPage";
 import GlobalStyles from "./GlobalStyles";
 import styled from "styled-components";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import { AuthProvider } from "./context/AuthContext";
 
 const AppContainer = styled.div`
   display: flex;
@@ -19,20 +24,35 @@ const MainContent = styled.div`
 `;
 
 const App = () => (
-  <Router>
-    <GlobalStyles />
-    <AppContainer>
-      <Header />
-      <MainContent>
-        <Routes>
-          <Route path="/" element={<HomePage/>} />
-          <Route path="/posts" element={<PostPage/>} />
-          <Route path="/post/:id" element={<PostDetailPage />} />
-        </Routes>
-      </MainContent>
-      <Footer />
-    </AppContainer>
-  </Router>
+  <AuthProvider>
+    <Router>
+      <GlobalStyles />
+      <AppContainer>
+        <Header />
+        <MainContent>
+          <Routes>
+            <Route path="/" element={<HomePage/>} />
+            <Route path="/posts" element={<PostPage/>} />
+            <Route path="/post/:id" element={<PostDetailPage />} />
+            <Route path="/login" element={<LoginPage/>} />
+            <Route path="/register" element={<RegisterPage/>} />
+          </Routes>
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+          />
+        </MainContent>
+        <Footer />
+      </AppContainer>
+    </Router>
+  </AuthProvider>
 )
 
 export default App;

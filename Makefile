@@ -20,4 +20,4 @@ git-push:
 	git push --set-upstream origin ${BRANCH}
 
 run:
-	poetry run uvicorn app.main:app --host localhost --port 8000 --reload
+	poetry run uvicorn app.main:app --host localhost --port 8001 --reload
