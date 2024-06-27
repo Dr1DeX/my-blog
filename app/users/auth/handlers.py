@@ -20,7 +20,7 @@ async def login(
         auth_service: Annotated[AuthService, Depends(get_auth_service)]
 ):
     try:
-        return await auth_service.login(username=body.username, password=body.password)
+        return await auth_service.login(email=body.email, password=body.password)
     except UserNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

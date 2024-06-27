@@ -12,8 +12,9 @@ class UserProfile(Base):
     username: Mapped[str] = mapped_column(nullable=True)
     password: Mapped[str] = mapped_column(nullable=True)
     name: Mapped[Optional[str]]
-    email: Mapped[Optional[str]]
+    email: Mapped[Optional[str]] = mapped_column(unique=True)
     google_access_token: Mapped[Optional[str]]
     yandex_access_token: Mapped[Optional[str]]
+    image: Mapped[Optional[str]] = mapped_column(nullable=True)
 
     posts = relationship('Posts', back_populates='author')

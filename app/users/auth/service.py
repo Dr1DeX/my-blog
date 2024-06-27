@@ -20,8 +20,8 @@ class AuthService:
     user_repository: UserRepository
     settings: Settings
 
-    async def login(self, username: str, password: str) -> UserLoginSchema:
-        user = await self.user_repository.get_user_by_username(username=username)
+    async def login(self, email: str, password: str) -> UserLoginSchema:
+        user = await self.user_repository.get_user_by_email(email=email)
         self._validate_auth_user(user=user, password=password)
         access_token = self.generate_access_token(user_id=user.id)
         return UserLoginSchema(user_id=user.id, access_token=access_token)

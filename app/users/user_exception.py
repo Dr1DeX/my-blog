@@ -12,3 +12,7 @@ class TokenExpireExtension(Exception):
 
 class TokenNotCorrectException(Exception):
     detail = 'Token not correct'
+
+
+class UserEmailUniqueException(Exception):
+    detail = 'This email is already registered'
