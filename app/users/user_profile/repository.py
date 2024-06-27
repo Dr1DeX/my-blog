@@ -19,7 +19,6 @@ class UserRepository:
         async with self.db_session as session:
             user_id: int = (await session.execute(query)).scalar()
             await session.commit()
-            await session.flush()
             return await self.get_user(user_id=user_id)
 
     async def get_user(self, user_id: int) -> UserProfile | None:
@@ -33,3 +32,10 @@ class UserRepository:
 
         async with self.db_session as session:
             return (await session.execute(query)).scalar_one_or_none()
+
+    async def get_user_by_email(self, email: str) -> UserProfile | None:
+        query = select(UserProfile).where(UserProfile.email == email)
+
+        async with self.db_session as session:
+            user: UserProfile = (await session.execute(query)).scalar_one_or_none()
+            return user

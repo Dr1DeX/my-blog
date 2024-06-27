@@ -1,12 +1,15 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.default_dependency import get_request_user_id
+from app.posts.posts_exception import FileFormatIncorrectException
+from app.users.user_exception import UserEmailUniqueException
 from app.users.users_dependency import get_user_service
 from app.users.user_profile.schema import UserCreateSchema, UserMeSchema
 from app.users.auth.schema import UserLoginSchema
 from app.users.user_profile.service import UserService
+from app.utils.upload_image import upload_image
 
 router = APIRouter(prefix='/api/user', tags=['user'])
 
@@ -19,7 +22,22 @@ async def create_user(
         body: UserCreateSchema,
         user_service: Annotated[UserService, Depends(get_user_service)]
 ):
-    return await user_service.create_user(username=body.username, password=body.password)
+    if body.image:
+        try:
+            image_url = await upload_image(image=body.image)
+            body.image = image_url
+        except FileFormatIncorrectException as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=e.detail
+            )
+    try:
+        return await user_service.create_user(body=body)
+    except UserEmailUniqueException as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=e.detail
+        )
 
 
 @router.get(

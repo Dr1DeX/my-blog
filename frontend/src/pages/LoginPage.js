@@ -40,7 +40,7 @@ const Button = styled.button`
 `;
 
 const LoginPage = () => {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const { login, isAuthenticated } = useAuth();
     const navigate = useNavigate();
@@ -48,7 +48,7 @@ const LoginPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await login(username, password);
+            await login(email, password);
         } catch (error) {
             toast.error('Произошла внутрення ошибка')
             console.log(error);
@@ -67,9 +67,9 @@ const LoginPage = () => {
             <form onSubmit={handleSubmit}>
                 <Input
                     type="text"
-                    placeholder="Имя пользователя"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                 />
                 <Input

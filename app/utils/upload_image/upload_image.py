@@ -20,9 +20,9 @@ async def upload_image(image: UploadFile) -> str | None:
         file_path = os.path.join(settings.UPLOAD_DIRECTORY, file_name)
 
         async with aiofiles.open(file_path, 'wb') as out_file:
-            content = await image.read()
-            await out_file.write(content)
+            while content := await image.read(1024):
+                await out_file.write(content)
+
         image_url = f'/static/{file_name}'
         return image_url
-    else:
-        return None
+    return None

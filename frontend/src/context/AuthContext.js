@@ -15,10 +15,10 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
 
     
-    const login = async (username, password) => {
+    const login = async (email, password) => {
         try {
             const response = await axios.post('http://localhost:8001/api/auth/login', {
-                username,
+                email,
                 password
             });
             if (response.status === 200) {

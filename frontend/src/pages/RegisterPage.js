@@ -3,7 +3,7 @@ import styled from "styled-components";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
-import { Link} from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 const RegisterContainer = styled.div`
     display: flex;
@@ -56,30 +56,74 @@ const Button = styled.button`
 const RegisterPage = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [repeatPassword, setRepeatPassword] = useState('')
     const [email, setEmail] = useState('');
     const [image, setImage] = useState(null);
     const { login } = useAuth();
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const formData = new FormData();
-        formData.append('username', username);
-        formData.append('password', password);
-        formData.append('email', email);
-        if (image) {
-            formData.append('image', image);
-        }
 
-        try {
-            await axios.post('http://localhost:8001/api/user/create_user', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
+        if (password !== repeatPassword) {
+            toast.error('Пароли не совпадают!')
+            return;
+        }
+        const reader = new FileReader();
+
+        reader.onloadend = async () => {
+            const imageBase64 =reader.result;
+
+            const data = {
+                username,
+                password,
+                email,
+                image: imageBase64,
+            };
+
+            try {
+                await axios.post('http://localhost:8001/api/user/create_user', data, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                toast.success('Регистрация прошла успешно!')
+                await login(email, password)
+                navigate('/posts')
+            } catch (error) {
+                if (error.response && error.response.status === 409) {
+                    toast.error('Этот email уже зарегестрирован.')
+                } else {
+                    toast.error('Произошла ошибка. Попробуйте позже')
                 }
-            });
-            toast.success('Регистрация прошла успешно!')
-            await login(username, password);
-        } catch (error) {
-            toast.error('Произошла ошибка. Попробуйте попозже.');
+            }
+        };
+
+        if (image) {
+            reader.readAsDataURL(image);
+        } else {
+            const data = {
+                username,
+                password,
+                email
+            };
+
+            try {
+                await axios.post('http://localhost:8001/api/user/create_user', data, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                toast.success('Регистрация прошла успешно!');
+                await login(email, password)
+                navigate('/posts');
+            } catch (error) {
+                if (error.response && error.response.status === 409) {
+                    toast.error('Этот email уже зарегестрирован.')
+                } else {
+                    toast.error('Произошла ошибка. Попробуйте позже')
+                }
+            }
         }
     };
 
@@ -99,6 +143,13 @@ const RegisterPage = () => {
                     placeholder="Пароль"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    required
+                />
+                <Input
+                    type="password"
+                    placeholder="Повторите пароль"
+                    value={repeatPassword}
+                    onChange={(e) => setRepeatPassword(e.target.value)}
                     required
                 />
                 <Input
