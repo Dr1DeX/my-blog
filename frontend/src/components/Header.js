@@ -84,8 +84,24 @@ const HamburgerBar = styled.div`
     `}
 `;
 
-const Username = styled.span`
+const UsernameContainer = styled.span`
+    display: flex;
+    align-items: center;
     margin-right: 10px;
+
+    img {
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        margin-right: 10px;
+    }
+
+    @media (max-width: 768px) {
+        img {
+            width: 30px;
+            height: 30px;
+        }
+    }
 `;
 
 const Header = () => {
@@ -110,7 +126,10 @@ const Header = () => {
             <Link to="/posts">Посты</Link>
             {isAuthenticated ? (
                 <>
-                    <Username>{user?.username}</Username>
+                    <UsernameContainer>
+                        {user?.image && <img src={user.image} alt="user" />}
+                        <span>{user?.username}</span>
+                    </UsernameContainer>
                     <Link to="/create-post">Создать пост</Link>
                     <Link to="/" onClick={logout}>Выйти</Link>
                 </>

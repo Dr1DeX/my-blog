@@ -1,6 +1,5 @@
 from datetime import datetime
 
-from fastapi import UploadFile
 from pydantic import BaseModel
 
 
@@ -10,7 +9,7 @@ class PostSchema(BaseModel):
     description: str | None = None
     author_name: str | None = None
     category_name: str | None = None
-    image_url: UploadFile | None = None
+    image_url: str | None = None
     pub_date: datetime | None = None
     pub_updated: datetime | None = None
 
@@ -28,7 +27,7 @@ class PostCreateSchema(BaseModel):
     title: str | None = None
     description: str | None = None
     category_id: int | None = None
-    image_url: UploadFile | None = None
+    image_url: str | None = None
 
 
 class CategoriesSchema(BaseModel):

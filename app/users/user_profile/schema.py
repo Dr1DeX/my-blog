@@ -18,6 +18,7 @@ class UserCreateSchema(BaseModel):
 class UserMeSchema(BaseModel):
     username: str | None = None
     email: str | None = None
+    image: str | None = None
 
     class Config:
         from_attributes = True

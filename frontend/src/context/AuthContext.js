@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -15,6 +15,15 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
 
     
+    useEffect(() => {
+        const storedToken = localStorage.getItem('authToken');
+        if (storedToken) {
+            setToken(storedToken);
+            fetchUserData(storedToken);
+            setIsAuthenticated(true);
+        }
+    }, []);
+
     const login = async (email, password) => {
         try {
             const response = await axios.post('http://localhost:8001/api/auth/login', {
@@ -24,6 +33,7 @@ export const AuthProvider = ({ children }) => {
             if (response.status === 200) {
                 const { access_token } = response.data;
                 setToken(access_token)
+                localStorage.setItem('authToken', access_token);
                 await fetchUserData(access_token);
                 setIsAuthenticated(true);
                 toast.success('Авторизация прошла успешно!');

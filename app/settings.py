@@ -10,7 +10,8 @@ class Settings(BaseSettings):
     DB_DRIVER: str = 'postgresql+asyncpg'
     JWT_SECRET_KEY: str = 'mega-super-secret'
     JWT_ENCODE_ALGORYTHM: str = 'HS256'
-    UPLOAD_DIRECTORY: str = '/uploads'
+    UPLOAD_DIRECTORY: str = 'app/static/user_avatars/'
+    STATIC_URL: str = '/static/user_avatars/'
 
     @property
     def db_url(self):

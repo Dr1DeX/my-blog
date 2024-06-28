@@ -9,7 +9,7 @@ from app.users.users_dependency import get_user_service
 from app.users.user_profile.schema import UserCreateSchema, UserMeSchema
 from app.users.auth.schema import UserLoginSchema
 from app.users.user_profile.service import UserService
-from app.utils.upload_image import upload_image
+from app.utils.upload_image import save_base64_image
 
 router = APIRouter(prefix='/api/user', tags=['user'])
 
@@ -24,7 +24,7 @@ async def create_user(
 ):
     if body.image:
         try:
-            image_url = await upload_image(image=body.image)
+            image_url = await save_base64_image(base64_str=body.image)
             body.image = image_url
         except FileFormatIncorrectException as e:
             raise HTTPException(

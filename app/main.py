@@ -30,7 +30,7 @@ app.add_middleware(
 if not os.path.exists(settings.UPLOAD_DIRECTORY):
     os.makedirs(settings.UPLOAD_DIRECTORY)
 
-app.mount('/static', StaticFiles(directory=settings.UPLOAD_DIRECTORY), name='static')
+app.mount(settings.STATIC_URL, StaticFiles(directory=settings.UPLOAD_DIRECTORY), name='static')
 
 app.include_router(post_router)
 app.include_router(auth_router)

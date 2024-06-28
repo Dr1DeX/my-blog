@@ -72,7 +72,7 @@ const RegisterPage = () => {
         const reader = new FileReader();
 
         reader.onloadend = async () => {
-            const imageBase64 =reader.result;
+            const imageBase64 = reader.result;
 
             const data = {
                 username,

@@ -1,4 +1,4 @@
-from app.utils.upload_image import upload_image
+from app.utils.upload_image import save_base64_image
 
 from dataclasses import dataclass
 
@@ -56,7 +56,10 @@ class PostService:
         return posts_schema
 
     async def create_post(self, body: PostCreateSchema, author_id: int) -> PostSchema:
-        image_url = await upload_image(image=body.image_url)
+        if body.image_url is not None:
+            image_url = await save_base64_image(base64_str=body.image_url)
+        else:
+            image_url = None
         post_id = await self.post_repository.create_post(body=body, author_id=author_id, image_url=image_url)
         post = await self.post_repository.get_post(post_id=post_id)
         if not post:
@@ -73,7 +76,10 @@ class PostService:
         )
 
     async def update_post(self, post_id: int, author_id: int, body: PostCreateSchema) -> PostSchema:
-        image_url = await upload_image(image=body.image_url)
+        if body.image_url is not None:
+            image_url = await save_base64_image(base64_str=body.image_url)
+        else:
+            image_url = None
         post_id = await self.post_repository.update_post(
             author_id=author_id,
             post_id=post_id,
