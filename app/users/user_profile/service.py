@@ -24,5 +24,6 @@ class UserService:
         user = await self.user_repository.get_user(user_id=user_id)
         return UserMeSchema(
             username=user.username,
-            email=user.email
+            email=user.email,
+            image=user.image
         )

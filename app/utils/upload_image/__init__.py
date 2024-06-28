@@ -1,3 +1,3 @@
-from app.utils.upload_image.upload_image import upload_image
+from app.utils.upload_image.upload_image import save_base64_image
 
-__all__ = ['upload_image']
+__all__ = ['save_base64_image']

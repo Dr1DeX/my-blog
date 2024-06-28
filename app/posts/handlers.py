@@ -20,7 +20,6 @@ async def get_posts(
         post_service: Annotated[PostService, Depends(get_post_service)]
 ):
     posts = await post_service.get_posts()
-    posts[-1].human_readable_dates()
     return posts
 
 
