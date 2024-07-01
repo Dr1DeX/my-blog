@@ -13,11 +13,13 @@ class PostService:
     post_repository: PostRepository
     post_cache_repository: PostCacheRepository
 
-    async def get_posts(self) -> list[PostSchema]:
-        if cache_posts := await self.post_cache_repository.get_posts():
-            return cache_posts
+    async def get_posts(self, page: int, page_size: int) -> tuple[list[PostSchema], int]:
+        if cache_posts := await self.post_cache_repository.get_posts(page=page, page_size=page_size):
+            total_count = await self.post_repository.get_total_count_posts()
+            return cache_posts, total_count
         else:
             posts = await self.post_repository.get_posts()
+            total_count = len(posts)
             posts_schema = [
                 PostSchema(
                     id=post.id,
@@ -32,7 +34,7 @@ class PostService:
                 for post in posts
             ]
             await self.post_cache_repository.set_posts(posts=posts_schema)
-            return posts_schema
+            return posts_schema[(page - 1) * page_size: page * page_size], total_count
 
     async def get_post(self, post_id: int) -> PostSchema:
 

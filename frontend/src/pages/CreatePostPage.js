@@ -137,7 +137,7 @@ const CreatePostPage = () => {
             };
 
             try {
-                await axios.post('http://localhost:8001/api/posts/create', data, {
+                await axios.post('http://localhost:8001/api/post/create', data, {
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`,
