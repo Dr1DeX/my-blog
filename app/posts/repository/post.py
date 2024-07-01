@@ -52,9 +52,8 @@ class PostRepository:
                 author_id=author_id,
                 image_url=image_url
             ).returning(Posts.id)
-            post_id = (await session.execute(query)).scalar()
+            post_id: int = (await session.execute(query)).scalar()
             await session.commit()
-            await session.flush()
             return post_id
 
     async def get_categories(self) -> list[Categories]:
@@ -69,22 +68,14 @@ class PostRepository:
             post: list[Posts] = (await session.execute(query)).scalars().all()
             return post
 
-    async def update_post(self, post_id: int, author_id: int, body: PostCreateSchema, image_url: str | None) -> int:
-        post_query = await self.get_post(post_id=post_id)
-        if not post_query:
-            raise PostNotFoundException
-        values = body.dict(exclude_unset=True)
-        if image_url:
-            values['image_url'] = image_url
+    async def update_post(self, post_id: int, author_id: int, body: PostCreateSchema) -> None:
         query = (update(Posts)
                  .where(Posts.id == post_id, Posts.author_id == author_id)
-                 .values(**values)
-                 ).returning(Posts.id)
+                 .values(**body.dict(exclude_unset=True))
+                 )
         async with self.db_session as session:
-            post_id: int = (await session.execute(query)).scalar_one_or_none()
+            await session.execute(query)
             await session.commit()
-            await session.flush()
-            return post_id
 
     async def delete_post(self, post_id: int, author_id: int) -> None:
         post_query = await self.get_post(post_id=post_id)
@@ -94,7 +85,6 @@ class PostRepository:
         async with self.db_session as session:
             await session.execute(query)
             await session.commit()
-            await session.flush()
 
     async def upload_image(self, author_id: int, post_id: int, file: UploadFile = File(...)) -> str:
         file_extension = file.filename.split('.')[-1]
@@ -117,6 +107,5 @@ class PostRepository:
         async with self.db_session as session:
             await session.execute(query)
             await session.commit()
-            await session.flush()
 
         return image_url

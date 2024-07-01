@@ -14,7 +14,7 @@ async def get_request_user_id(
         token: security.http.HTTPAuthorizationCredentials = Security(reusable_oauth2)
 ) -> int:
     try:
-        user_id = auth_service.get_user_id_from_access_token(token=token.credentials)
+        user_id = await auth_service.get_user_id_from_access_token(token=token.credentials)
     except TokenExpireExtension as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -26,3 +26,4 @@ async def get_request_user_id(
             detail=e.detail
         )
     return user_id
+
