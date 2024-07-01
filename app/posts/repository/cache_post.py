@@ -15,9 +15,11 @@ settings = Settings()
 class PostCacheRepository:
     redis_connection: Redis
 
-    async def get_posts(self) -> list[PostSchema]:
+    async def get_posts(self, page: int, page_size: int) -> list[PostSchema]:
+        start = (page - 1) * page_size
+        end = start + page_size - 1
         async with self.redis_connection as redis:
-            posts_json = await redis.lrange('posts', 0, -1)
+            posts_json = await redis.lrange('posts', start, end)
             posts_schema = [
                 PostSchema(
                     id=post_data['id'],

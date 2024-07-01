@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, status, Depends, HTTPException
+from fastapi import APIRouter, status, Depends, HTTPException, Query
 
 from app.default_dependency import get_request_user_id
 from app.posts.posts_dependency import get_post_service
@@ -14,13 +14,15 @@ router = APIRouter(prefix='/api/post', tags=['post'])
 
 @router.get(
     '/all',
-    response_model=list[PostSchema]
+    response_model=tuple[list[PostSchema], int]
 )
 async def get_posts(
-        post_service: Annotated[PostService, Depends(get_post_service)]
+        post_service: Annotated[PostService, Depends(get_post_service)],
+        page: int = Query(1, ge=1),
+        page_size: int = Query(6, ge=1)
 ):
-    posts = await post_service.get_posts()
-    return posts
+    posts, total_count = await post_service.get_posts(page=page, page_size=page_size)
+    return posts, total_count
 
 
 @router.get(
