@@ -23,6 +23,30 @@ const isTokenExpired = (token) => {
     const decoded = jwtDecode(token);
     const currentTime = Date.now() / 1000;
     return decoded.exp < currentTime;
+};
+
+const setupAxiosInterceptors = (logout) => {
+    axios.interceptors.request.use(
+        (config) => {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
+            return config;
+        },
+        (error) => Promise.reject(error)
+    );
+
+    axios.interceptors.response.use(
+        (response) => response,
+        async (error) => {
+            if (error.response.status === 401) {
+                toast.error('Ваша сессия истекла, перезайдите в систему!')
+                logout();
+            }
+            return Promise.reject(error);
+        }
+    )
 }
 
 export const AuthProvider = ({ children }) => {
@@ -39,6 +63,8 @@ export const AuthProvider = ({ children }) => {
             setIsAuthenticated(true);
         }
 
+        setupAxiosInterceptors(logout);
+
         const refreshTokenInterval = async () => {
             if (token && isTokenExpired(token)) {
                 try {
@@ -47,13 +73,18 @@ export const AuthProvider = ({ children }) => {
                     localStorage.setItem('authToken', newToken);
                 } catch (error) {
                     console.error('Failed to refresh token:', error);
+                    logout();
                 }
             }
         };
 
         const intervalId = setInterval(refreshTokenInterval, 3300 * 1000);
 
-        return () => clearInterval(intervalId);
+        return () => {
+            clearInterval(intervalId);
+            axios.interceptors.request.eject();
+            axios.interceptors.response.eject();
+        }
     }, [token]);
 
     const login = async (email, password) => {
