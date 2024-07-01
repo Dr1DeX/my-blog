@@ -1,3 +1,4 @@
+from app.posts.repository.cache_post import PostCacheRepository
 from app.utils.upload_image import save_base64_image
 
 from dataclasses import dataclass
@@ -10,29 +11,37 @@ from app.posts.schema import PostSchema, PostCreateSchema, CategoriesSchema
 @dataclass
 class PostService:
     post_repository: PostRepository
+    post_cache_repository: PostCacheRepository
 
     async def get_posts(self) -> list[PostSchema]:
-        posts = await self.post_repository.get_posts()
-        posts_schema = [
-            PostSchema(
-                id=post.id,
-                title=post.title,
-                description=post.description,
-                author_name=post.author.username,
-                category_name=post.category.name,
-                image_url=post.image_url,
-                pub_date=post.pub_date,
-                pub_updated=post.pub_updated
-            )
-            for post in posts
-        ]
-        return posts_schema
+        if cache_posts := await self.post_cache_repository.get_posts():
+            return cache_posts
+        else:
+            posts = await self.post_repository.get_posts()
+            posts_schema = [
+                PostSchema(
+                    id=post.id,
+                    title=post.title,
+                    description=post.description,
+                    author_name=post.author.username,
+                    category_name=post.category.name,
+                    image_url=post.image_url,
+                    pub_date=post.pub_date,
+                    pub_updated=post.pub_updated
+                )
+                for post in posts
+            ]
+            await self.post_cache_repository.set_posts(posts=posts_schema)
+            return posts_schema
 
     async def get_post(self, post_id: int) -> PostSchema:
+
         post = await self.post_repository.get_post(post_id=post_id)
+
         if not post:
             raise PostNotFoundException
-        return PostSchema(
+
+        post_schema = PostSchema(
             id=post.id,
             title=post.title,
             description=post.description,
@@ -42,6 +51,8 @@ class PostService:
             pub_date=post.pub_date,
             pub_updated=post.pub_updated,
         )
+
+        return post_schema
 
     async def get_categories(self) -> list[CategoriesSchema]:
         categories = await self.post_repository.get_categories()
@@ -64,7 +75,7 @@ class PostService:
         post = await self.post_repository.get_post(post_id=post_id)
         if not post:
             raise PostNotFoundException
-        return PostSchema(
+        post_schema = PostSchema(
             id=post.id,
             title=post.title,
             description=post.description,
@@ -75,19 +86,35 @@ class PostService:
             pub_updated=post.pub_updated,
         )
 
+        await self.post_cache_repository.create_post(posts=post_schema)
+
+        return post_schema
+
     async def update_post(self, post_id: int, author_id: int, body: PostCreateSchema) -> PostSchema:
         if body.image_url is not None:
-            image_url = await save_base64_image(base64_str=body.image_url)
-        else:
-            image_url = None
-        post_id = await self.post_repository.update_post(
+            body['image_url'] = await save_base64_image(base64_str=body.image_url)
+
+        await self.post_repository.update_post(
             author_id=author_id,
             post_id=post_id,
             body=body,
-            image_url=image_url,
         )
         updated_post = await self.post_repository.get_post(post_id=post_id)
-        return PostSchema.model_validate(updated_post)
+        post_schema = PostSchema(
+            id=updated_post.id,
+            title=updated_post.title,
+            description=updated_post.description,
+            author_name=updated_post.author.username,
+            category_name=updated_post.category.name,
+            image_url=updated_post.image_url,
+            pub_date=updated_post.pub_date,
+            pub_updated=updated_post.pub_updated,
+        )
+
+        await self.post_cache_repository.update_post(post=post_schema)
+
+        return post_schema
 
     async def delete_post(self, post_id: int, author_id: int) -> None:
         await self.post_repository.delete_post(post_id=post_id, author_id=author_id)
+        await self.post_cache_repository.delete_post(post_id=post_id)

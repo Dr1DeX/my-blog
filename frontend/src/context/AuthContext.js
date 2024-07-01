@@ -1,12 +1,28 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-
+import { jwtDecode } from "jwt-decode";
 
 const AuthContext = createContext();
 
 export const useAuth = () => {
     return useContext(AuthContext);
+}
+
+const refreshToken = async (oldToken) => {
+    try {
+        const response = await axios.post('http://localhost:8001/api/auth/refresh_token', {oldToken: oldToken});
+        return response.data.access_token
+    } catch (error) {
+        console.error('Error refreshing token:', error);
+        throw error;
+    }
+};
+
+const isTokenExpired = (token) => {
+    const decoded = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+    return decoded.exp < currentTime;
 }
 
 export const AuthProvider = ({ children }) => {
@@ -22,7 +38,23 @@ export const AuthProvider = ({ children }) => {
             fetchUserData(storedToken);
             setIsAuthenticated(true);
         }
-    }, []);
+
+        const refreshTokenInterval = async () => {
+            if (token && isTokenExpired(token)) {
+                try {
+                    const newToken = await refreshToken(token);
+                    setToken(newToken);
+                    localStorage.setItem('authToken', newToken);
+                } catch (error) {
+                    console.error('Failed to refresh token:', error);
+                }
+            }
+        };
+
+        const intervalId = setInterval(refreshTokenInterval, 3300 * 1000);
+
+        return () => clearInterval(intervalId);
+    }, [token]);
 
     const login = async (email, password) => {
         try {
@@ -56,11 +88,22 @@ export const AuthProvider = ({ children }) => {
         }
     }
 
-    const logout = () => {
-        setToken(null);
-        setIsAuthenticated(false);
-        setUser(null);
-        toast.success('Вы успешно вышли из системы!')
+    const logout = async () => {
+        try {
+            await axios.post('http://localhost:8001/api/auth/logout', { token }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setToken(null);
+            setIsAuthenticated(false);
+            setUser(null);
+            localStorage.removeItem('authToken');
+            toast.success('Вы успешно вышли из системы!');
+        } catch (error) {
+            console.error('Failed to logout:', error)
+            toast.error('Произошла внутренняя ошибка, мы уже чиним!')
+        }
         
     }
 

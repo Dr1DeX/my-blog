@@ -12,6 +12,10 @@ class Settings(BaseSettings):
     JWT_ENCODE_ALGORYTHM: str = 'HS256'
     UPLOAD_DIRECTORY: str = 'app/static/user_avatars/'
     STATIC_URL: str = '/static/user_avatars/'
+    CACHE_HOST: str = 'localhost'
+    CACHE_PORT: int = 6379
+    CACHE_DB: int = 0
+    CACHE_TTL: int = 3600
 
     @property
     def db_url(self):
