@@ -16,5 +16,6 @@ class UserProfile(Base):
     google_access_token: Mapped[Optional[str]]
     yandex_access_token: Mapped[Optional[str]]
     image: Mapped[Optional[str]] = mapped_column(nullable=True)
+    description: Mapped[Optional[str]] = mapped_column(nullable=True)
 
     posts = relationship('Posts', back_populates='author')

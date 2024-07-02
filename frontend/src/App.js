@@ -14,6 +14,7 @@ import RegisterPage from "./pages/RegisterPage";
 import { AuthProvider } from "./context/AuthContext";
 import CreatePostPage from "./pages/CreatePostPage";
 import PrivateRoute from "./context/PrivateRoute";
+import UserProfile from "./components/UserProfile";
 
 const AppContainer = styled.div`
   display: flex;
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/post/:id" element={<PostDetailPage />} />
             <Route path="/login" element={<LoginPage/>} />
             <Route path="/register" element={<RegisterPage/>} />
+            <Route path="/profile" element={<UserProfile />} />
             <Route
               path="/create-post"
               element={
