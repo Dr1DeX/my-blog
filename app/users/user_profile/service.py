@@ -4,7 +4,7 @@ from app.users.user_exception import UserEmailUniqueException
 from app.users.user_profile.repository import UserRepository
 from app.users.auth.schema import UserLoginSchema
 from app.users.auth.service import AuthService
-from app.users.user_profile.schema import UserCreateSchema, UserMeSchema
+from app.users.user_profile.schema import UserCreateSchema, UserMeSchema, UserUpdateSchema
 
 
 @dataclass
@@ -22,8 +22,9 @@ class UserService:
 
     async def get_user(self, user_id: int) -> UserMeSchema:
         user = await self.user_repository.get_user(user_id=user_id)
-        return UserMeSchema(
-            username=user.username,
-            email=user.email,
-            image=user.image
-        )
+        return UserMeSchema.model_validate(user)
+
+    async def update_user(self, user_id: int, user_update: UserUpdateSchema) -> UserMeSchema:
+        await self.user_repository.update_user(user_id=user_id, user_update=user_update)
+        updated_user = await self.user_repository.get_user(user_id=user_id)
+        return UserMeSchema.model_validate(updated_user)

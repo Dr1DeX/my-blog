@@ -238,6 +238,7 @@ const Header = () => {
                         </>
                     ) : (
                         <>
+                            <Link to="/profile" onClick={closeSidebar}>Личный кабинет</Link>
                             <Link to="/create-post" onClick={closeSidebar}>Создать пост</Link>
                             <Link to="/" onClick={() => { logout(); closeSidebar(); }}>Выйти</Link>
                         </>

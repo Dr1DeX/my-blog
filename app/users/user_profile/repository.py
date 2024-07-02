@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.users.user_profile.models import UserProfile
-from app.users.user_profile.schema import UserCreateSchema
+from app.users.user_profile.schema import UserCreateSchema, UserUpdateSchema
 
 
 @dataclass
@@ -39,3 +39,14 @@ class UserRepository:
         async with self.db_session as session:
             user: UserProfile = (await session.execute(query)).scalar_one_or_none()
             return user
+
+    async def update_user(self, user_id: int, user_update: UserUpdateSchema):
+        query = (update(
+            UserProfile)
+                 .where(UserProfile.id == user_id)
+                 .values(**user_update.dict(exclude_none=True))
+                 )
+
+        async with self.db_session as session:
+            await session.execute(query)
+            await session.commit()

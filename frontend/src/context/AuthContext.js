@@ -25,10 +25,13 @@ const isTokenExpired = (token) => {
     return decoded.exp < currentTime;
 };
 
-const setupAxiosInterceptors = (logout) => {
-    axios.interceptors.request.use(
-        (config) => {
-            const token = localStorage.getItem('authToken');
+const setupAxiosInterceptors = (logout, refreshAuthToken) => {
+    const requestInterceptor = axios.interceptors.request.use(
+        async (config) => {
+            let token = localStorage.getItem('authToken');
+            if (token && isTokenExpired(token)) {
+                token = await refreshToken(token);
+            }
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`;
             }
@@ -37,16 +40,18 @@ const setupAxiosInterceptors = (logout) => {
         (error) => Promise.reject(error)
     );
 
-    axios.interceptors.response.use(
+    const responseInterceptor = axios.interceptors.response.use(
         (response) => response,
         async (error) => {
-            if (error.response.status === 401) {
+            if (error.response && error.response.status === 401) {
                 toast.error('Ваша сессия истекла, перезайдите в систему!')
-                logout();
+                logout()
             }
             return Promise.reject(error);
         }
     )
+
+    return {requestInterceptor, responseInterceptor}
 }
 
 export const AuthProvider = ({ children }) => {
@@ -55,6 +60,18 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
 
     
+    const refreshAuthToken = async (oldToken) => {
+        try {
+            const newToken = await refreshToken(oldToken);
+            setToken(newToken);
+            localStorage.setItem('authToken', newToken);
+            return newToken;
+        } catch (error) {
+            console.error('Failed to refresh token:', error)
+            logout()
+        }
+    }
+
     useEffect(() => {
         const storedToken = localStorage.getItem('authToken');
         if (storedToken) {
@@ -63,27 +80,19 @@ export const AuthProvider = ({ children }) => {
             setIsAuthenticated(true);
         }
 
-        setupAxiosInterceptors(logout);
+        const { requestInterceptor, responseInterceptor } = setupAxiosInterceptors(logout, refreshAuthToken);
 
-        const refreshTokenInterval = async () => {
+        const refreshTokenInterval = setInterval(async () => {
             if (token && isTokenExpired(token)) {
-                try {
-                    const newToken = await refreshToken(token);
-                    setToken(newToken);
-                    localStorage.setItem('authToken', newToken);
-                } catch (error) {
-                    console.error('Failed to refresh token:', error);
-                    logout();
-                }
+                await refreshAuthToken(token);
             }
-        };
+        }, 3300 * 1000)
 
-        const intervalId = setInterval(refreshTokenInterval, 3300 * 1000);
 
         return () => {
-            clearInterval(intervalId);
-            axios.interceptors.request.eject();
-            axios.interceptors.response.eject();
+            clearInterval(refreshTokenInterval);
+            axios.interceptors.request.eject(requestInterceptor);
+            axios.interceptors.response.eject(responseInterceptor);
         }
     }, [token]);
 
@@ -126,17 +135,17 @@ export const AuthProvider = ({ children }) => {
                     Authorization: `Bearer ${token}`
                 }
             });
+        } catch (error) {
+            console.error('Failed to logout:', error);
+            toast.error('Произошла внутренняя ошибка, мы уже чиним!');
+        } finally {
             setToken(null);
             setIsAuthenticated(false);
             setUser(null);
             localStorage.removeItem('authToken');
             toast.success('Вы успешно вышли из системы!');
-        } catch (error) {
-            console.error('Failed to logout:', error)
-            toast.error('Произошла внутренняя ошибка, мы уже чиним!')
         }
-        
-    }
+    };
 
     return (
         <AuthContext.Provider value={{ isAuthenticated, token, user, login, logout}}>

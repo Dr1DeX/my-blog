@@ -1,6 +1,4 @@
-from typing import Annotated, Optional
-
-from fastapi import UploadFile, Form
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -15,9 +13,17 @@ class UserCreateSchema(BaseModel):
 
 
 class UserMeSchema(BaseModel):
-    username: str | None = None
-    email: str | None = None
-    image: str | None = None
+    username: Optional[str] = None
+    email: Optional[str] = None
+    image: Optional[str] = None
+    description: Optional[str] = None
 
     class Config:
         from_attributes = True
+
+
+class UserUpdateSchema(BaseModel):
+    image: Optional[str] = None
+    username: Optional[str] = None
+    email: Optional[str] = None
+    description: Optional[str] = None
