@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled, { css, keyframes } from 'styled-components';
 import { useAuth } from '../context/AuthContext';
+import axios from "axios";
 
 
 const HeaderContainer = styled.header`
@@ -152,10 +153,57 @@ const UserProfile = styled.div`
     }
 `;
 
+const SearchInput = styled.input`
+    padding: 8px;
+    border-radius: 4px;
+    border: none;
+    margin-right: 10px;
+    outline: none;
+
+    @media (max-width: 768px) {
+        margin: 10px 0;
+    }
+`;
+
+const Dropdown = styled.div`
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    color: black;
+    width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 2000;
+    max-height: 300px;
+    overflow-y: auto;
+
+    @media (max-width: 768px) {
+        left: 0;
+        transform: none;
+        width: 90%;
+
+    }
+`;
+
+const DropdownItem = styled.div`
+    padding: 10px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #f0f0f0;
+    }
+`;
+
+
 const Header = () => {
     const { isAuthenticated, user, logout } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [sidebarPosition, setSidebarPosition] = useState('left');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
     const navigate = useNavigate();
 
     const toggleMenu = () => {
@@ -176,6 +224,27 @@ const Header = () => {
     const closeSidebar = () => {
         setIsOpen(false);
     };
+
+    const handleSearchChange = async (e) => {
+        setSearchTerm(e.target.value);
+
+        if (e.target.value.length > 2) {
+            try {
+                const response = await axios.get(`http://localhost:8001/api/search?q=${e.target.value}`);
+                setSearchResults(response.data.posts);
+            } catch (error) {
+                console.error('Ошибка при поиске:', error);
+            }
+        } else {
+            setSearchResults([]);
+        };
+    }
+
+    const handleResultClick = (id) => {
+        navigate(`/posts/${id}`);
+        setSearchTerm('');
+        setSearchResults([]);
+    }
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -206,6 +275,12 @@ const Header = () => {
             <Nav>
                 <Link to="/">Главная</Link>
                 <Link to="/posts">Посты</Link>
+                <SearchInput
+                    type="text"
+                    placeholder="Поиск..."
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                />
                 {isAuthenticated ? (
                     <>
                         <Link to="/create-post">Создать пост</Link>
@@ -245,6 +320,15 @@ const Header = () => {
                     )}
                 </SidebarContent>
             </Sidebar>
+            {searchResults.length > 0 && (
+                <Dropdown>
+                    {searchResults.map((post) => (
+                        <DropdownItem key={post.id} onClick={() => handleResultClick(post.id)}>
+                            {post.title}
+                        </DropdownItem>
+                    ))}
+                </Dropdown>
+            )}
         </HeaderContainer>
     );
 };

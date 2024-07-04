@@ -7,22 +7,9 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-fastapi = {extras = ["all"], version = "^0.111.0"}
 pydantic = "^2.7.3"
 pydantic-settings = "^2.3.0"
-alembic = "^1.13.1"
-sqlalchemy = "^2.0.30"
-greenlet = "^3.0.3"
-psycopg2-binary = "^2.9.9"
-asyncpg = "^0.29.0"
-python-jose = {extras = ["cryptography"], version = "^3.3.0"}
-httpx = "^0.27.0"
-aiofiles = "^23.2.1"
-redis = "^5.0.7"
-aiocron = "^1.8"
 elasticsearch = "^8.14.0"
-confluent-kafka = "^2.4.0"
-aiokafka = "^0.11.0"
 aio-pika = "^9.4.2"
 aiohttp = "^3.9.5"
 
