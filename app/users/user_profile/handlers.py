@@ -9,7 +9,7 @@ from app.users.users_dependency import get_user_service
 from app.users.user_profile.schema import UserCreateSchema, UserMeSchema, UserUpdateSchema
 from app.users.auth.schema import UserLoginSchema
 from app.users.user_profile.service import UserService
-from app.utils.upload_image import save_base64_image
+from utils.upload_image import save_base64_image
 
 router = APIRouter(prefix='/api/user', tags=['user'])
 

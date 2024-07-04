@@ -1,5 +1,6 @@
 version: '3.9'
 services:
+
   db:
     image: postgres:16.2-alpine
     restart: always
@@ -19,6 +20,7 @@ services:
     build:
       dockerfile: backend.Dockerfile
     hostname: blog-backend
+    container_name: stargazer-backend
     depends_on:
       - db
     ports:
@@ -39,8 +41,89 @@ services:
   cache:
     image: redis:7.2.4-alpine
     restart: always
+    hostname: cache
+    container_name: stargazer-redis
     ports:
       - '6379:6379'
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
+    container_name: stargazer-elasticsearch
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xms512m
+      - ELASTIC_PASSWORD=password
+      - xpack.security.enabled=true
+      - xpack.security.audit.enabled=true
+      - xpack.security.authc.api_key.enabled=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    networks:
+      - es-net
+    ports:
+      - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    command: ["/bin/bash", "-c", "bin/elasticsearch-plugin install -b repository-url; bin/elasticsearch"]
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.1
+    container_name: stargazer-kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=kibana123
+      - SERVER_REWRITE_BASE_PATH=true
+      - ELASTICSEARCH_REQUEST_TIMEOUT=60000
+    networks:
+      - es-net
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: stargazer-rabbit
+    restart: always
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: 'user'
+      RABBITMQ_DEFAULT_PASS: 'password'
+    volumes:
+      - rabbit-data:/var/lib/rabbitmq
+
+  search_consumer:
+    shm_size: 128mb
+    restart: always
+    build:
+      context: .
+      dockerfile: /app/search/workers/consumer.Dockerfile
+    depends_on:
+      - rabbitmq
+    env_file:
+      - .env.dev
+    volumes:
+      - search_worker_data:/varlib/rabbitmq/search_worker
+
+networks:
+  es-net:
+    driver: bridge
+  kafka-network:
+    driver: bridge
+
 volumes:
   blog-data:
+    driver: local
+  esdata:
+    driver: local
+  rabbit-data:
+    driver: local
+  search_worker_data:
+    driver: local
