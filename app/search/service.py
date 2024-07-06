@@ -15,6 +15,8 @@ class ElasticService:
 
     async def save_post_to_elasticsearch(self, post: DeliveryPostSchema) -> None:
         await self.es_repository.save_post_to_elasticsearch(post=post)
+        print(f'Post create success')
 
     async def delete_post_from_elasticsearch(self, post_id: str) -> None:
         await self.es_repository.delete_post_from_elasticsearch(post_id=post_id)
+        print(f'Post {post_id} delete success')

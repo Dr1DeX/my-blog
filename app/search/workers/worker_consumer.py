@@ -3,6 +3,7 @@ import json
 
 import aio_pika
 from aio_pika.abc import AbstractRobustQueue
+from elasticsearch import AsyncElasticsearch
 
 from app.infrastructure.search import get_elastic_connection
 from app.search.service import ElasticService
@@ -22,14 +23,17 @@ async def get_message_from_queue(queue: AbstractRobustQueue):
                 message_body = json.loads(message.body)
                 message_data = MessageSchema(**message_body)
                 print(f'Received data: {message_data}')
-                await process_message(message=message_data)
+                return message_data
 
 
-async def process_message(message: MessageSchema):
+async def process_message(es_client: AsyncElasticsearch, message: MessageSchema):
+    es_repository = ElasticRepository(es=es_client)
+    es_service = ElasticService(es_repository=es_repository)
+
     if message.action == 'create':
-        print(f'Create method {message}')
+        await es_service.save_post_to_elasticsearch(post=message.post)
     elif message.action == 'delete':
-        print(f'Delete method {message}')
+        await es_service.delete_post_from_elasticsearch(post_id=message.post['id'])
 
 
 async def main():
@@ -42,8 +46,17 @@ async def main():
         queue = await channel.declare_queue('search_post_data', durable=True)
         await queue.bind(exchange=exchange, routing_key=controller.get_routing_key)
 
-        post_data = await get_message_from_queue(queue=queue)
-        print(f'Mock: {post_data}')
+        es_client = AsyncElasticsearch(
+            hosts=[settings.ELASTICSEARCH_URL],
+            basic_auth=(settings.ELASTICSEARCH_USER, settings.ELASTICSEARCH_PASSWORD)
+        )
+        try:
+            while True:
+                post_data = await get_message_from_queue(queue=queue)
+                if post_data:
+                    await process_message(es_client=es_client, message=post_data)
+        finally:
+            await es_client.close()
 
 
 if __name__ == '__main__':
