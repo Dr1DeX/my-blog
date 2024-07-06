@@ -8,6 +8,7 @@ from app.search.service import ElasticService
 
 router = APIRouter(prefix='/api/search', tags=['search'])
 
+
 @router.get(
     '',
     response_model=list[PostSchema]

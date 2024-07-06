@@ -15,6 +15,8 @@ services:
       - blog-data:/var/lib/postgresql/data
     ports:
       - '5432:5432'
+    networks:
+      - es-net
 
   backend:
     build:
@@ -28,6 +30,8 @@ services:
     restart: always
     env_file:
       - .env.dev
+    networks:
+      - es-net
 
   frontend:
     build:
@@ -37,6 +41,8 @@ services:
       - '3000:3000'
     depends_on:
       - backend
+    networks:
+      - es-net
 
   cache:
     image: redis:7.2.4-alpine
@@ -45,10 +51,13 @@ services:
     container_name: stargazer-redis
     ports:
       - '6379:6379'
+    networks:
+      - es-net
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
     container_name: stargazer-elasticsearch
+    hostname: elasticsearch
     environment:
       - node.name=es01
       - cluster.name=es-docker-cluster
@@ -98,6 +107,8 @@ services:
       RABBITMQ_DEFAULT_PASS: 'password'
     volumes:
       - rabbit-data:/var/lib/rabbitmq
+    networks:
+      - es-net
 
   search_consumer:
     shm_size: 128mb
@@ -111,11 +122,11 @@ services:
       - .env.dev
     volumes:
       - search_worker_data:/varlib/rabbitmq/search_worker
+    networks:
+      - es-net
 
 networks:
   es-net:
-    driver: bridge
-  kafka-network:
     driver: bridge
 
 volumes:
