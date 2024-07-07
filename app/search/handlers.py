@@ -17,4 +17,5 @@ async def search_posts(
         elastic_service: Annotated[ElasticService, Depends(get_elastic_service)],
         query: str
 ):
-    pass
+    return await elastic_service.search_posts(query=query)
+
