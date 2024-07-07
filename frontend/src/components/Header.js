@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import styled, { css, keyframes } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useAuth } from '../context/AuthContext';
 import axios from "axios";
-
 
 const HeaderContainer = styled.header`
     display: flex;
@@ -167,12 +166,11 @@ const SearchInput = styled.input`
 
 const Dropdown = styled.div`
     position: absolute;
-    top: 60px;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 60px; /* Это значение нужно отрегулировать в зависимости от высоты вашего SearchInput */
+    left: 0;
+    width: 100%;
     background-color: white;
     color: black;
-    width: 300px;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
@@ -181,22 +179,53 @@ const Dropdown = styled.div`
     overflow-y: auto;
 
     @media (max-width: 768px) {
-        left: 0;
-        transform: none;
         width: 90%;
-
+        left: 5%;
     }
 `;
 
 const DropdownItem = styled.div`
+    display: flex;
+    align-items: center;
     padding: 10px;
     cursor: pointer;
+    border-bottom: 1px solid #ddd;
+
+    &:last-child {
+        border-bottom: none;
+    }
 
     &:hover {
         background-color: #f0f0f0;
     }
-`;
 
+    img {
+        border-radius: 5px;
+        width: 60px;
+        height: 60px;
+        margin-right: 10px;
+    }
+
+    .content {
+        display: flex;
+        flex-direction: column;
+
+        .author {
+            font-weight: bold;
+        }
+
+        .description {
+            display: flex;
+            flex-direction: column;
+            margin-top: 5px;
+
+            .highlight {
+                background-color: yellow;
+                padding: 0 2px;
+            }
+        }
+    }
+`;
 
 const Header = () => {
     const { isAuthenticated, user, logout } = useAuth();
@@ -230,10 +259,20 @@ const Header = () => {
 
         if (e.target.value.length > 2) {
             try {
-                const response = await axios.get(`http://localhost:8001/api/search?q=${e.target.value}`);
-                setSearchResults(response.data.posts);
+                const response = await axios.get(`http://localhost:8001/api/search?query=${e.target.value}`);
+                const results = response.data;
+
+                const highlightedResults = results.map(post => {
+                    const regex = new RegExp(`(${searchTerm})`, 'gi');
+                    const highlightedDescription = post.description.replace(regex, '<span class="highlight">$1</span>');
+
+                    return { ...post, highlightedDescription };
+                });
+
+                setSearchResults(highlightedResults);
             } catch (error) {
                 console.error('Ошибка при поиске:', error);
+                setSearchResults([]);
             }
         } else {
             setSearchResults([]);
@@ -241,14 +280,14 @@ const Header = () => {
     }
 
     const handleResultClick = (id) => {
-        navigate(`/posts/${id}`);
+        navigate(`/post/${id}`);
         setSearchTerm('');
         setSearchResults([]);
     }
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (isOpen && !event.target.closest('.sidebar') && !event.target.closest('.hamburger') && !event.target.closest('.user-profile')) {
+            if (isOpen && !event.target.closest('.sidebar') && !event.target.closest('.hamburger') && !event.target.closest('.user-profile') && !event.target.closest('.dropdown')) {
                 closeSidebar();
             }
         };
@@ -299,7 +338,7 @@ const Header = () => {
             <SidebarOverlay isOpen={isOpen} onClick={closeSidebar} />
             <Sidebar isOpen={isOpen} className="sidebar" position={sidebarPosition}>
                 <SidebarContent>
-                {isAuthenticated && user?.image && (
+                    {isAuthenticated && user?.image && (
                         <img src={user.image} alt="user" onClick={goToProfile} />
                     )}
                     {isAuthenticated && <span>{user?.username}</span>}
@@ -321,10 +360,17 @@ const Header = () => {
                 </SidebarContent>
             </Sidebar>
             {searchResults.length > 0 && (
-                <Dropdown>
+                <Dropdown className="dropdown">
                     {searchResults.map((post) => (
                         <DropdownItem key={post.id} onClick={() => handleResultClick(post.id)}>
-                            {post.title}
+                            <img src={post.image} alt={post.title} />
+                            <div className="content">
+                                <span className="author">{post.author_name}</span>
+                                <div
+                                    className="description"
+                                    dangerouslySetInnerHTML={{ __html: post.highlightedDescription }}
+                                />
+                            </div>
                         </DropdownItem>
                     ))}
                 </Dropdown>

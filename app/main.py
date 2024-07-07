@@ -7,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from app.posts.handlers import router as post_router
 from app.users.auth.handlers import router as auth_router
 from app.users.user_profile.handlers import router as user_router
+from app.search.handlers import router as search_router
 from app.settings import Settings
 
 settings = Settings()
@@ -35,3 +36,4 @@ app.mount(settings.STATIC_URL, StaticFiles(directory=settings.UPLOAD_DIRECTORY),
 app.include_router(post_router)
 app.include_router(auth_router)
 app.include_router(user_router)
+app.include_router(search_router)
