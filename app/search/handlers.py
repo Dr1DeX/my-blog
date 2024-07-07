@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from app.posts.schema import PostSchema
 from app.search.search_dependency import get_elastic_service
@@ -15,7 +15,6 @@ router = APIRouter(prefix='/api/search', tags=['search'])
 )
 async def search_posts(
         elastic_service: Annotated[ElasticService, Depends(get_elastic_service)],
-        query: str
+        query: Annotated[str, Query(...)]
 ):
     return await elastic_service.search_posts(query=query)
-
