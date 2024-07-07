@@ -117,6 +117,7 @@ export const AuthProvider = ({ children }) => {
 
     const fetchUserData = async (token) => {
         try {
+
             const response = await axios.get('http://localhost:8001/api/user/me', {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -124,6 +125,9 @@ export const AuthProvider = ({ children }) => {
             });
             setUser(response.data);
         } catch (error) {
+            if (error.response && error.response.status === 401) {
+                logout();
+            }
             console.error('Failed to fetch user data', error)
         }
     }
