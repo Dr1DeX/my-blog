@@ -26,6 +26,16 @@ async def get_posts(
 
 
 @router.get(
+    '/etl_data',
+    response_model=list[PostSchema]
+)
+async def get_all_posts(
+        post_service: Annotated[PostService, Depends(get_post_service)]
+):
+    return await post_service.get_all_posts()
+
+
+@router.get(
     '/{post_id}',
     response_model=PostSchema
 )
