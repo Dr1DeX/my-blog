@@ -152,3 +152,20 @@ class PostService:
 
             }
         )
+
+    async def get_all_posts(self) -> list[PostSchema]:
+        posts = await self.post_repository.get_posts()
+        posts_schema = [
+            PostSchema(
+                id=post.id,
+                title=post.title,
+                description=post.description,
+                author_name=post.author.username,
+                category_name=post.category.name,
+                image_url=post.image_url,
+                pub_date=post.pub_date,
+                pub_updated=post.pub_updated
+            )
+            for post in posts
+        ]
+        return posts_schema

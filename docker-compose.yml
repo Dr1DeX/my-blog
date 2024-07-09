@@ -125,6 +125,7 @@ services:
     networks:
       - es-net
 
+
 networks:
   es-net:
     driver: bridge
