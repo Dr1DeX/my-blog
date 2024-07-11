@@ -1,43 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link} from "react-router-dom";
-import styled from "styled-components";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
-
-const Container = styled.div`
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-`;
-
-const Title = styled.h2`
-    text-align: center;
-    margin-bottom: 20px;
-`;
-
-const Input = styled.input`
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-`;
-
-const Button = styled.button`
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    border-radius: 5px;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-    &:hover {
-        background-color: #0056b3;
-    }
-`;
+import Button from "../../components/LoginPage/Button";
+import Container from "../../components/LoginPage/Container";
+import Title from "../../components/LoginPage/Title";
+import Input from "../../components/LoginPage/Input";
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');

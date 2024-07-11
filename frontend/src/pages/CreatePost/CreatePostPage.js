@@ -1,104 +1,18 @@
 import React, { useState, useEffect } from "react";
-import styled from "styled-components";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
+import CreatePostContainer from "../../components/CreatePost/CreatePostContainer";
+import CreatePostForm from "../../components/CreatePost/CreatePostForm";
+import Input from "../../components/CreatePost/Input";
+import TextArea from "../../components/CreatePost/TextArea";
+import Select from "../../components/CreatePost/Select";
+import Button from "../../components/CreatePost/Button";
+import FormTitle from "../../components/CreatePost/FormTitle";
 
-const CreatePostContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #f0f2f5;
-    padding: 20px
-`;
 
-const CreatePostForm = styled.form`
-    display: flex;
-    flex-direction: column;
-    background: white;
-    padding: 48px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 500px;
-    width: 100%;
 
-    @media (max-width: 768px) {
-        padding: 24px;
-        box-shadow: none;
-    }
-`;
-
-const FormTitle = styled.h2`
-    margin-bottom: 20px;
-    text-align: center;
-
-    @media (max-width: 768px) {
-        font-size: 1.5rem;
-    }
-`;
-
-const Input = styled.input`
-    margin-bottom: 15px;
-    padding: 18px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-
-    @media (max-width: 768px) {
-        padding: 14px;
-        font-size: 14px;
-    }
-`;
-
-const TextArea = styled.textarea`
-    margin-bottom: 15px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-    resize: none;
-
-    @media (max-width) {
-        padding: 14px;
-        font-size: 14px;
-    }
-`;
-
-const Select = styled.select`
-    margin-bottom: 15px;
-    padding: 18px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-
-    @media (max-width: 768px) {
-        padding: 14px;
-        font-size: 14px;
-    }
-`;
-
-const Button = styled.button`
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
-
-    &:hover {
-        background-color: #0056b3;
-    }
-
-    @media (max-width: 768px) {
-        padding: 14px;
-        font-size: 14px;
-    }
-`;
 
 const CreatePostPage = () => {
     const [title, setTitle] = useState('');
@@ -125,17 +39,17 @@ const CreatePostPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const reader = new FileReader();
-
+    
         reader.onloadend = async () => {
             const imageBase64 = reader.result;
-
+    
             const data = {
                 title,
                 description,
                 category_id: parseInt(category),
                 image_url: imageBase64
             };
-
+    
             try {
                 await axios.post('http://localhost:8001/api/post/create', data, {
                     headers: {
@@ -149,7 +63,7 @@ const CreatePostPage = () => {
                 toast.error('Произошла внутреняя ошибка. Попробуйте позже')
             }
         };
-
+    
         if (image) {
             reader.readAsDataURL(image);
         } else {
@@ -158,7 +72,7 @@ const CreatePostPage = () => {
                 description,
                 category_id: parseInt(category),
             };
-
+    
             try {
                 await axios.post('http://localhost:8001/api/post/create', data, {
                     headers: {

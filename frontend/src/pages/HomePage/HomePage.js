@@ -1,9 +1,6 @@
 import React from "react";
-import styled from "styled-components";
+import HomeContainer from "../../components/HomePage/HomeContainer";
 
-const HomeContainer = styled.div`
-    padding: 20px;
-`;
 
 const HomePage = () => {
     return (
