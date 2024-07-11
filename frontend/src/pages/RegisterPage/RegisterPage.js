@@ -1,57 +1,14 @@
 import React, { useState } from "react";
-import styled from "styled-components";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom"
+import RegisterContainer from "../../components/RegisterPage/RegisterContainer";
+import RegisterForm from "../../components/RegisterPage/RegisterForm";
+import RegisterTitle from "../../components/RegisterPage/RegisterTitle";
+import Input from "../../components/RegisterPage/Input";
+import Button from "../../components/RegisterPage/Button";
 
-const RegisterContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f0f2f5;
-`;
-
-const RegisterForm = styled.form`
-    display: flex;
-    flex-direction: column;
-    background: white;
-    padding: 48px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    max-width: 400px;
-    width: 100%;
-`;
-
-const RegisterTitle = styled.h2`
-    margin-bottom: 20px;
-    text-align: center;
-`;
-
-const Input = styled.input`
-    margin-bottom: 15px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-`;
-
-const Button = styled.button`
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
-
-    &:hover {
-        background-color: #0056b3;
-    }
-`;
 
 const RegisterPage = () => {
     const [username, setUsername] = useState('');

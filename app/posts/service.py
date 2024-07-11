@@ -169,3 +169,20 @@ class PostService:
             for post in posts
         ]
         return posts_schema
+
+    async def my_posts(self, author_id: int) -> list[PostSchema]:
+        posts = await self.post_repository.my_posts(author_id=author_id)
+        posts_schema = [
+            PostSchema(
+                id=post.id,
+                title=post.title,
+                description=post.description,
+                author_name=post.author.username,
+                category_name=post.category.name,
+                image_url=post.image_url,
+                pub_date=post.pub_date,
+                pub_updated=post.pub_updated
+            )
+            for post in posts
+        ]
+        return posts_schema

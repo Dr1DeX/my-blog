@@ -115,3 +115,12 @@ class PostRepository:
             result = await session.execute(select(func.count(Posts.id)))
             total_count: int = result.scalar()
             return total_count
+
+    async def my_posts(self, author_id: int) -> list[Posts]:
+        query = (select(Posts)
+                 .options(joinedload(Posts.author), joinedload(Posts.category))
+                 .where(Posts.author_id == author_id)
+                 )
+        async with self.db_session as session:
+            posts: list[Posts] = (await session.execute(query)).scalars().all()
+            return posts

@@ -1,35 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import styled from 'styled-components';
 import axios from 'axios';
-
-const PostDetailContainer = styled.div`
-    padding: 20px;
-    max-width: 800px;
-    margin: 0 auto;
-`;
-
-const PostImage = styled.img`
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-`;
-
-const PostTitle = styled.h2`
-    margin-top: 20px;
-    font-size: 2em;
-`;
-
-const PostMeta = styled.div`
-    font-size: 0.9rem;
-    color: #777;
-    margin: 10px 0;
-`;
-
-const PostDescription = styled.p`
-    line-height: 1.6;
-    margin-top: 20px;
-`;
+import PostImage from '../../components/PostDetailPage/PostImage';
+import PostDetailContainer from '../../components/PostDetailPage/PostDetailContainer';
+import PostTitle from '../../components/PostDetailPage/PostTitle';
+import PostDescription from '../../components/PostDetailPage/PostDescription';
+import PostMeta from '../../components/PostDetailPage/PostMeta';
 
 const PostDetailPage = () => {
     const { id } = useParams();
