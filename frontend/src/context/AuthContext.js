@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -58,6 +59,7 @@ export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [token, setToken] = useState(null);
     const [user, setUser] = useState(null);
+    const navigate = useNavigate();
 
     
     const refreshAuthToken = async (oldToken) => {
@@ -126,7 +128,7 @@ export const AuthProvider = ({ children }) => {
             setUser(response.data);
         } catch (error) {
             if (error.response && error.response.status === 401) {
-                logout();
+                navigate('/login');
             }
             console.error('Failed to fetch user data', error)
         }
