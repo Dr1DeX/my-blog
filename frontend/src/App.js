@@ -16,7 +16,7 @@ import Header from "./components/Header/Header";
 import UserProfile from "./components/UserProfile/UserProfile";
 import AppContainer from "./components/App/AppContainer";
 import MainContent from "./components/App/MainContent";
-import UserPost from "./pages/UserPosts/UserPosts";
+import UserPostPage from "./pages/UserPostPage/UserPostPage";
 
 
 const App = () => (
@@ -29,19 +29,12 @@ const App = () => (
             <Routes>
               <Route path="/" element={<HomePage/>} />
               <Route path="/posts" element={<PostPage postUrl="http://localhost:8001/api/post/all" />} />
-              <Route path="/my-posts" element={<UserPost />} />
+              <Route path="/my-posts" element={<UserPostPage postUrl="http://localhost:8001/api/post/my_posts" />} />
               <Route path="/post/:id" element={<PostDetailPage />} />
               <Route path="/login" element={<LoginPage/>} />
               <Route path="/register" element={<RegisterPage/>} />
               <Route path="/profile" element={<UserProfile />} />
-              <Route
-                path="/create-post"
-                element={
-                  <PrivateRoute>
-                    <CreatePostPage />
-                  </PrivateRoute>
-                }
-              />  
+              <Route path="/create-post" element={<CreatePostPage />} />  
             </Routes>
             <ToastContainer
               position="top-right"

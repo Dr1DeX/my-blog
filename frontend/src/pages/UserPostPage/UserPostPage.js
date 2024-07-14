@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useAuth } from "../../context/AuthContext";
 import PostContent from "../../components/PostPage/PostContent";
 import PostsContainer from "../../components/PostPage/PostContainer";
 import PostItem from "../../components/PostPage/PostItem";
@@ -9,15 +10,17 @@ import PostDescription from "../../components/PostPage/PostDescription";
 import ReadMoreButton from "../../components/PostPage/ReadMoreButton";
 import PostMeta from "../../components/PostPage/PostMeta";
 import Paginator from "../../components/Paginator/Paginator";
+import EditButton from "./EditButton";
 
 
 
-const PostPage = ({ postUrl }) => {
+const UserPostPage = ({ postUrl }) => {
     const [posts, setPosts] = useState([]);
     const [page, setPage] = useState(1);
     const [pageSize] = useState(6);
     const [isLoading, setIsLoading] = useState(false);
     const [totalPosts, setTotalPosts] = useState(0);
+    const { token } = useAuth();
 
 
 
@@ -29,7 +32,11 @@ const PostPage = ({ postUrl }) => {
                     params: {
                         page,
                         page_size: pageSize
-                    }
+                    },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
                 });
                 setPosts(response.data[0]);
                 setTotalPosts(response.data[1]);
@@ -40,7 +47,7 @@ const PostPage = ({ postUrl }) => {
             }
         };
         fetchPosts();
-    }, [page, pageSize]);
+    }, [page, pageSize, token, postUrl]);
 
     const totalPages = Math.ceil(totalPosts / pageSize);
     
@@ -67,6 +74,7 @@ const PostPage = ({ postUrl }) => {
                     })}
                     </PostMeta>
                     <ReadMoreButton to={`/post/${post.id}`}>Подробнее</ReadMoreButton>
+                    <EditButton to={`/edit-post/${post.id}`}>Редактировать</EditButton>
                 </PostContent>
             </PostItem>
         ))}
@@ -81,4 +89,4 @@ const PostPage = ({ postUrl }) => {
     )
 }
 
-export default PostPage;
+export default UserPostPage;
