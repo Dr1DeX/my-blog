@@ -32,6 +32,7 @@ const setupAxiosInterceptors = (logout, refreshAuthToken) => {
             let token = localStorage.getItem('authToken');
             if (token && isTokenExpired(token)) {
                 token = await refreshToken(token);
+                localStorage.setItem('authToken', token);
             }
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`;

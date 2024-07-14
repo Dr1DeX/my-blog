@@ -27,13 +27,16 @@ async def get_posts(
 
 @router.get(
     '/my_posts',
-    response_model=list[PostSchema]
+    response_model=tuple[list[PostSchema], int]
 )
 async def my_posts(
         post_service: Annotated[PostService, Depends(get_post_service)],
+        page: int = Query(1, ge=1),
+        page_size: int = Query(6, ge=1),
         author_id: int = Depends(get_request_user_id),
 ):
-    return await post_service.my_posts(author_id=author_id)
+    posts, total_count = await post_service.my_posts(page=page, page_size=page_size, author_id=author_id)
+    return posts, total_count
 
 
 @router.get(

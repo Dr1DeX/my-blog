@@ -170,8 +170,9 @@ class PostService:
         ]
         return posts_schema
 
-    async def my_posts(self, author_id: int) -> list[PostSchema]:
+    async def my_posts(self, page: int, page_size: int, author_id: int) -> tuple[list[PostSchema], int]:
         posts = await self.post_repository.my_posts(author_id=author_id)
+        total_count = len(posts)
         posts_schema = [
             PostSchema(
                 id=post.id,
@@ -185,4 +186,4 @@ class PostService:
             )
             for post in posts
         ]
-        return posts_schema
+        return posts_schema[(page - 1) * page_size: page * page_size], total_count
