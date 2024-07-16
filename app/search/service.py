@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+import httpx
+
 from app.posts.schema import PostSchema
 from app.search.repository import ElasticRepository
 from app.search.workers.contracts.consumer.search_schema import DeliveryPostSchema
@@ -23,3 +25,9 @@ class ElasticService:
 
     async def save_bulk_post_to_etl(self, posts: list[DeliveryPostSchema]) -> None:
         await self.es_repository.save_bulk_post_to_etl(posts=posts)
+
+    async def etl_script(self) -> list[DeliveryPostSchema]:
+        async with httpx.AsyncClient() as client:
+            response = await client.get('http://localhost:8001/api/post/etl_data')
+            posts_schema = [DeliveryPostSchema.model_validate(post) for post in response.json()]
+        return posts_schema
