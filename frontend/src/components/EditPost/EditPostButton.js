@@ -1,15 +1,17 @@
 import styled from "styled-components";
 
-const SaveButton = styled.button`
+const EditPostButton = styled.button`
     padding: 10px 20px;
     background-color: #007bff;
-    color: white;
+    color: #fff;
     border: none;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 1em;
+    transition: background-color 0.3s;
+
     &:hover {
         background-color: #0056b3;
     }
 `;
 
-export default SaveButton;
+export default EditPostButton;

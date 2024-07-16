@@ -1,3 +1,5 @@
+from fastapi import HTTPException, status
+
 from app.posts.repository.cache_post import PostCacheRepository
 from app.posts.workers.contracts.publisher import SearchPublisherController
 from app.posts.workers.contracts.publisher.search_service_schema import DeliveryPostSchema
@@ -115,8 +117,16 @@ class PostService:
         return posts_schema
 
     async def update_post(self, post_id: int, author_id: int, body: PostCreateSchema) -> PostSchema:
+        post = await self.post_repository.get_post(post_id=post_id)
+
+        if post.author_id != author_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail='Permission denied!'
+            )
         if body.image_url is not None:
-            body['image_url'] = await save_base64_image(base64_str=body.image_url)
+            image_url = await save_base64_image(base64_str=body.image_url)
+            body = body.copy(update={'image_url': image_url})
 
         await self.post_repository.update_post(
             author_id=author_id,
@@ -187,3 +197,22 @@ class PostService:
             for post in posts
         ]
         return posts_schema[(page - 1) * page_size: page * page_size], total_count
+
+    async def my_post(self, author_id: int, post_id: int) -> PostSchema:
+        post = await self.post_repository.my_post(author_id=author_id, post_id=post_id)
+
+        if not post:
+            raise PostNotFoundException
+
+        post_schema = PostSchema(
+            id=post.id,
+            title=post.title,
+            description=post.description,
+            author_name=post.author.username,
+            category_name=post.category.name,
+            image_url=post.image_url,
+            pub_date=post.pub_date,
+            pub_updated=post.pub_updated,
+        )
+
+        return post_schema

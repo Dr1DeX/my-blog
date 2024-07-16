@@ -67,6 +67,7 @@ const PostPage = ({ postUrl }) => {
                                 minute: '2-digit',
                     })}
                     </PostMeta>
+                    <PostTitle>Категория: {post.category_name}</PostTitle>
                 </PostContent>
                 </PostLink>
             </PostItem>
