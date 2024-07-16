@@ -46,10 +46,7 @@ async def main():
         queue = await channel.declare_queue('search_post_data', durable=True)
         await queue.bind(exchange=exchange, routing_key=controller.get_routing_key)
 
-        es_client = AsyncElasticsearch(
-            hosts=[settings.ELASTICSEARCH_URL],
-            basic_auth=(settings.ELASTICSEARCH_USER, settings.ELASTICSEARCH_PASSWORD)
-        )
+        es_client = await get_elastic_connection()
         try:
             while True:
                 post_data = await get_message_from_queue(queue=queue)
