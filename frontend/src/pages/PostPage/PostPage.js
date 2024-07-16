@@ -6,9 +6,9 @@ import PostItem from "../../components/PostPage/PostItem";
 import PostImage from "../../components/PostPage/PostImage";
 import PostTitle from "../../components/PostPage/PostTitle";
 import PostDescription from "../../components/PostPage/PostDescription";
-import ReadMoreButton from "../../components/PostPage/ReadMoreButton";
 import PostMeta from "../../components/PostPage/PostMeta";
 import Paginator from "../../components/Paginator/Paginator";
+import PostLink from "../../components/PostPage/PostLink";
 
 
 
@@ -53,6 +53,7 @@ const PostPage = ({ postUrl }) => {
         <PostsContainer>
         {posts.map((post) => (
             <PostItem key={post.id}>
+                <PostLink to={`/post/${post.id}`}> 
                 <PostImage src={post.image_url} alt={post.title} />
                 <PostContent>
                     <PostTitle>{post.title}</PostTitle>
@@ -66,8 +67,8 @@ const PostPage = ({ postUrl }) => {
                                 minute: '2-digit',
                     })}
                     </PostMeta>
-                    <ReadMoreButton to={`/post/${post.id}`}>Подробнее</ReadMoreButton>
                 </PostContent>
+                </PostLink>
             </PostItem>
         ))}
         </PostsContainer>
