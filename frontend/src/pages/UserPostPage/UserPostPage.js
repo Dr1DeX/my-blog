@@ -7,12 +7,10 @@ import PostItem from "../../components/PostPage/PostItem";
 import PostImage from "../../components/PostPage/PostImage";
 import PostTitle from "../../components/PostPage/PostTitle";
 import PostDescription from "../../components/PostPage/PostDescription";
-import ReadMoreButton from "../../components/PostPage/ReadMoreButton";
 import PostMeta from "../../components/PostPage/PostMeta";
 import Paginator from "../../components/Paginator/Paginator";
 import EditButton from "./EditButton";
-
-
+import PostLink from "../../components/UserPostPage/PostLink";
 
 const UserPostPage = ({ postUrl }) => {
     const [posts, setPosts] = useState([]);
@@ -21,8 +19,6 @@ const UserPostPage = ({ postUrl }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [totalPosts, setTotalPosts] = useState(0);
     const { token } = useAuth();
-
-
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -60,22 +56,24 @@ const UserPostPage = ({ postUrl }) => {
         <PostsContainer>
         {posts.map((post) => (
             <PostItem key={post.id}>
-                <PostImage src={post.image_url} alt={post.title} />
-                <PostContent>
-                    <PostTitle>{post.title}</PostTitle>
-                    <PostDescription>{post.description.slice(0,100)}...</PostDescription>
-                    <PostMeta>
-                    Автор поста: {post.author_name} | Последнее обновление {new Date(post.pub_updated).toLocaleString('ru-RU', {
+                <PostLink to={`/post/${post.id}`}>
+                    <PostImage src={post.image_url} alt={post.title} />
+                    <PostContent>
+                        <PostTitle>{post.title}</PostTitle>
+                        <PostDescription>{post.description.slice(0,100)}...</PostDescription>
+                        <PostMeta>
+                            Автор поста: {post.author_name} | Последнее обновление {new Date(post.pub_updated).toLocaleString('ru-RU', {
                                 day: '2-digit',
                                 month: '2-digit',
                                 year: 'numeric',
                                 hour: '2-digit',
                                 minute: '2-digit',
-                    })}
-                    </PostMeta>
-                    <ReadMoreButton to={`/post/${post.id}`}>Подробнее</ReadMoreButton>
-                    <EditButton to={`/edit-post/${post.id}`}>Редактировать</EditButton>
-                </PostContent>
+                            })}
+                            <PostTitle>Категория: {post.category_name}</PostTitle>
+                        </PostMeta>
+                    </PostContent>
+                </PostLink>
+                <EditButton to={`/edit-post/${post.id}`}>Редактировать</EditButton>
             </PostItem>
         ))}
         </PostsContainer>
@@ -86,7 +84,7 @@ const UserPostPage = ({ postUrl }) => {
             onPageChange={handlePageChange}
         />
         </>
-    )
+    );
 }
 
 export default UserPostPage;
