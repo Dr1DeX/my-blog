@@ -17,6 +17,7 @@ import UserProfile from "./components/UserProfile/UserProfile";
 import AppContainer from "./components/App/AppContainer";
 import MainContent from "./components/App/MainContent";
 import UserPostPage from "./pages/UserPostPage/UserPostPage";
+import EditPostPage from "./pages/EditPostPage/EditPostPage";
 
 
 const App = () => (
@@ -34,7 +35,8 @@ const App = () => (
               <Route path="/login" element={<LoginPage/>} />
               <Route path="/register" element={<RegisterPage/>} />
               <Route path="/profile" element={<UserProfile />} />
-              <Route path="/create-post" element={<CreatePostPage />} />  
+              <Route path="/create-post" element={<CreatePostPage />} />
+              <Route path="/edit-post/:id" element={<EditPostPage postUrl="http://localhost:8001/api/post/my_post" updatePostUrl="http://localhost:8001/api/post/update_post" categoriesUrl="http://localhost:8001/api/post/categories/all"/>} />  
             </Routes>
             <ToastContainer
               position="top-right"

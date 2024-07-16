@@ -40,6 +40,24 @@ async def my_posts(
 
 
 @router.get(
+    '/my_post/{post_id}',
+    response_model=PostSchema
+)
+async def my_post(
+        post_service: Annotated[PostService, Depends(get_post_service)],
+        post_id: int,
+        author_id: int = Depends(get_request_user_id)
+):
+    try:
+        return await post_service.my_post(author_id=author_id, post_id=post_id)
+    except PostNotFoundException as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=e.detail
+        )
+
+
+@router.get(
     '/etl_data',
     response_model=list[PostSchema]
 )
@@ -63,7 +81,7 @@ async def get_post(
         return post
     except PostNotFoundException as e:
         raise HTTPException(
-            status_code=status.HTTP_204_NO_CONTENT,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail=e.detail
         )
 
@@ -121,7 +139,7 @@ async def create_post(
 )
 async def update_post(
         body: PostCreateSchema,
-        post_id: int,
+        post_id: Annotated[int, Query(alias='id')],
         post_service: Annotated[PostService, Depends(get_post_service)],
         author_id: int = Depends(get_request_user_id)
 ):

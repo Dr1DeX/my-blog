@@ -124,3 +124,12 @@ class PostRepository:
         async with self.db_session as session:
             posts: list[Posts] = (await session.execute(query)).scalars().all()
             return posts
+
+    async def my_post(self, author_id: int, post_id: int) -> Posts:
+        query = (select(Posts)
+                 .options(joinedload(Posts.author), joinedload(Posts.category))
+                 .where(Posts.author_id == author_id, Posts.id == post_id)
+                 )
+        async with self.db_session as session:
+            post: Posts = (await session.execute(query)).scalar_one_or_none()
+            return post
