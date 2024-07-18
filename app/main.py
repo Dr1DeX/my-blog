@@ -1,4 +1,7 @@
 import os
+import sentry_sdk
+
+from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,9 +15,21 @@ from app.settings import Settings
 
 settings = Settings()
 
+sentry_sdk.init(
+    dsn=settings.SENTRY_DSN,
+    traces_sample_rate=1.0,
+    profiles_sample_rate=1.0,
+)
+
 app = FastAPI(
     title='My blog'
 )
+
+
+@app.get('/sentry-debug')
+async def trigger_error():
+    pass
+
 
 origins = [
     'http://localhost:3000',
@@ -27,6 +42,9 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*']
 )
+
+app.add_middleware(SentryAsgiMiddleware)
+
 
 if not os.path.exists(settings.UPLOAD_DIRECTORY):
     os.makedirs(settings.UPLOAD_DIRECTORY)

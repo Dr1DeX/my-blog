@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     RABBITMQ_DEFAULT_PASS: str = 'guest'
     RABBITMQ_HOSTNAME: str = 'localhost'
 
+    SENTRY_DSN: str = ''
+
     @property
     def db_url(self):
         return f'{self.DB_DRIVER}://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}'
