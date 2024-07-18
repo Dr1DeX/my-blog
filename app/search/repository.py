@@ -17,7 +17,7 @@ class ElasticRepository:
                         {
                             'multi_match': {
                                 'query': query,
-                                'fields': ['title^3', 'description^2', 'author_name', 'category_name'],
+                                'fields': ['title^3', 'description^2', 'author_name', 'category_name', 'image_url'],
                                 'fuzziness': 'AUTO'
                             }
                         },

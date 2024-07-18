@@ -22,7 +22,8 @@ class PostService:
 
     async def get_posts(self, page: int, page_size: int) -> tuple[list[PostSchema], int]:
         if cache_posts := await self.post_cache_repository.get_posts(page=page, page_size=page_size):
-            return cache_posts, len(cache_posts)
+            total_count = await self.post_repository.get_total_count_posts()
+            return cache_posts, total_count
         else:
             posts = await self.post_repository.get_posts()
             total_count = len(posts)
