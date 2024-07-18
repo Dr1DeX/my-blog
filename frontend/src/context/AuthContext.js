@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }) => {
             return newToken;
         } catch (error) {
             console.error('Failed to refresh token:', error)
-            logout()
+            logout();
         }
     }
 
@@ -130,7 +130,6 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             if (error.response && error.response.status === 401) {
                 logout();
-                navigate('/login');
             }
             console.error('Failed to fetch user data', error)
         }
@@ -151,6 +150,7 @@ export const AuthProvider = ({ children }) => {
             setIsAuthenticated(false);
             setUser(null);
             localStorage.removeItem('authToken');
+            navigate('/login');
         }
     };
 

@@ -6,7 +6,7 @@ from uuid import uuid4
 from fastapi import UploadFile, File
 
 from dataclasses import dataclass
-from sqlalchemy import select, delete, update, insert
+from sqlalchemy import select, delete, update, insert, func
 from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -109,6 +109,12 @@ class PostRepository:
             await session.commit()
 
         return image_url
+
+    async def get_total_count_posts(self) -> int:
+        async with self.db_session as session:
+            result = await session.execute(select(func.count(Posts.id)))
+            total_count: int = result.scalar()
+            return total_count
 
     async def my_posts(self, author_id: int) -> list[Posts]:
         query = (select(Posts)

@@ -154,7 +154,7 @@ const Header = () => {
                 <Dropdown className="dropdown">
                     {searchResults.map((post) => (
                         <DropdownItem key={post.id} onClick={() => handleResultClick(post.id)}>
-                            <img src={post.image} alt={post.title} />
+                            <img src={post.image_url} alt={post.title} />
                             <div className="content">
                                 <span className="author">{post.author_name}</span>
                                 <div
