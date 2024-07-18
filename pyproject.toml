@@ -25,6 +25,7 @@ confluent-kafka = "^2.4.0"
 aiokafka = "^0.11.0"
 aio-pika = "^9.4.2"
 aiohttp = "^3.9.5"
+sentry-sdk = "^2.10.0"
 
 
 [build-system]

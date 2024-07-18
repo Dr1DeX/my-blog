@@ -1,3 +1,5 @@
+import sentry_sdk
+
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -27,6 +29,7 @@ async def create_user(
             image_url = await save_base64_image(base64_str=body.image)
             body.image = image_url
         except FileFormatIncorrectException as e:
+            sentry_sdk.capture_exception(e)
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=e.detail
@@ -34,6 +37,7 @@ async def create_user(
     try:
         return await user_service.create_user(body=body)
     except UserEmailUniqueException as e:
+        sentry_sdk.capture_exception(e)
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=e.detail

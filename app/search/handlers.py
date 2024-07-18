@@ -1,3 +1,5 @@
+import sentry_sdk
+
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, HTTPException, status
@@ -30,6 +32,7 @@ async def etl_script(
         posts = await elastic_service.etl_script()
         await elastic_service.save_bulk_post_to_etl(posts=posts)
     except Exception as e:
+        sentry_sdk.capture_exception(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=e

@@ -1,3 +1,5 @@
+import sentry_sdk
+
 from typing import Annotated
 
 from fastapi import APIRouter, status, Depends, HTTPException, Query
@@ -51,6 +53,7 @@ async def my_post(
     try:
         return await post_service.my_post(author_id=author_id, post_id=post_id)
     except PostNotFoundException as e:
+        sentry_sdk.capture_exception(e)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=e.detail
@@ -80,6 +83,7 @@ async def get_post(
         post.human_readable_dates()
         return post
     except PostNotFoundException as e:
+        sentry_sdk.capture_exception(e)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=e.detail
@@ -97,6 +101,7 @@ async def get_posts_by_categories_name(
     try:
         return await post_service.get_posts_by_categories_name(cat_name=cat_name)
     except PostByCategoryNameException as e:
+        sentry_sdk.capture_exception(e)
         raise HTTPException(
             status_code=status.HTTP_204_NO_CONTENT,
             detail=e.detail
@@ -127,6 +132,7 @@ async def create_post(
         post.human_readable_dates()
         return post
     except CategoryNotFoundException as e:
+        sentry_sdk.capture_exception(e)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=e.detail
@@ -150,6 +156,7 @@ async def update_post(
             body=body
         )
     except PostNotFoundException as e:
+        sentry_sdk.capture_exception(e)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=e.detail
@@ -167,6 +174,7 @@ async def delete_post(
     try:
         await post_service.delete_post(post_id=post_id, author_id=author_id)
     except PostNotFoundException as e:
+        sentry_sdk.capture_exception(e)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=e.detail
